@@ -1,0 +1,397 @@
+
+:root {
+  --primary-color: #9C5FE9;
+  --primary-light: #EDE1FF;
+  --secondary-color: #6546D7;
+  --text-color: #333;
+  --light-text: #777;
+  --white: #fff;
+  --border-radius: 10px;
+  --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: #f8f8f8;
+  color: #333;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+header {
+  background-color: #fff;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo-circle {
+  width: 30px;
+  height: 30px;
+  background-color: #d3a4e3;
+  border-radius: 50%;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.logo-circle:hover {
+  background-color: #8440b0;
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  margin-right: 75px;
+}
+
+.nav-links li {
+  margin-left: 20px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #333;
+  font-weight: 600;
+}
+
+.nav-links a:hover {
+  color: #9c54c9;
+}
+
+.user-profile {
+  width: 32px;
+  height: 30px;
+  background-color: #9c54c9;
+  border-radius: 50%;
+  margin-left: 15px;
+  background-image: url("../images/user.png");
+  cursor: pointer;
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: 50px;
+  right: 20px;
+  background-color: white;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  width: 150px;
+  display: none;
+  z-index: 100;
+}
+
+.profile-dropdown.show {
+  display: block;
+}
+
+.dropdown-item {
+  padding: 12px 15px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+
+.dropdown-item:hover {
+  background-color: #f5f5f5;
+}
+
+.hero {
+  background-color: #9c54c9;
+  color: white;
+  text-align: center;
+  padding: 20px 0;
+
+}
+
+.hero p {
+  max-width: 800px;
+  margin: 0 auto;
+  font-size: 16px;
+}
+
+.banner {
+  height: 300px;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("../images/Homepage_image1.png");
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: var(--white);
+  text-align: center;
+  padding: 0 20px;
+}
+
+.banner h1 {
+    color: white;
+    font-size: 3rem;
+    position: relative;
+    z-index: 1;
+}
+
+.search-container {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  margin: 0 auto;
+  margin-top: -40px;
+}
+
+.search-title {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.search-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: center;
+}
+
+.search-field {
+  flex: 1;
+  min-width: 350px;
+}
+
+.search-field label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.search-field select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+.search-field input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+
+.search-btn {
+  background-color: #d6b5e5;
+    color: white;
+    border: none;
+    padding: 12px 0;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    width: 100%;
+    font-size: 1rem;
+}
+
+.search-btn:hover {
+  background-color: #8440b0;
+}
+
+.destinations {
+  padding: 40px 20px;
+}
+
+.destinations h2 {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.destination-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.destination-card {
+  background-color: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.destination-card:hover {
+  transform: translateY(-10px);
+}
+
+.destination-img {
+  height: 150px;
+  width: 100%;
+  object-fit: cover;
+}
+
+.destination-info {
+  padding: 15px;
+}
+
+.destination-info h3 {
+  margin-bottom: 10px;
+}
+
+.destination-info p {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+footer {
+  background-color: #f3e5f5;
+  padding: 20px 0;
+  text-align: center;
+  margin-top: 40px;
+}
+
+/* Results Page Styles */
+.form-container {
+  padding: 20px;
+  margin: -40px 20px 0;
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  position: relative;
+  z-index: 10;
+}
+
+.location-input {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  width: 100%;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.results-container {
+  padding: 0 20px 20px;
+}
+
+.result-card {
+  display: grid;
+  grid-template-columns: 80px 1fr auto;
+  gap: 10px;
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  padding: 10px;
+  margin-bottom: 15px;
+  box-shadow: var(--box-shadow);
+}
+
+.bus-img {
+  width: 80px;
+  height: 60px;
+  border-radius: 5px;
+  background-size: cover;
+  background-position: center;
+}
+
+.bus-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.route {
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.schedule {
+  font-size: 12px;
+  color: var(--light-text);
+}
+
+.price {
+  font-size: 12px;
+  color: var(--light-text);
+}
+
+.book-btn {
+  background-color: var(--primary-color);
+  color: var(--white);
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  font-size: 12px;
+  cursor: pointer;
+  height: fit-content;
+  align-self: center;
+}
+
+.book-btn:hover {
+  background-color: #8440b0;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .search-fields {
+    grid-template-columns: 1fr;
+  }
+  
+  .result-card {
+    grid-template-columns: 60px 1fr auto;
+  }
+  
+  .bus-img {
+    width: 60px;
+    height: 50px;
+  }
+}
+
+#main-container {
+  display: block;
+}
+
+#results-container {
+  display: none;
+}
+
+/* Page transition */
+.fade-in {
+  animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+
+
+

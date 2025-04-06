@@ -1,0 +1,250 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+body {
+    background-color: #f8f8f8;
+    color: #333;
+    line-height: 1.6;
+}
+  
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+header {
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+  
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+}
+  
+.logo {
+    display: flex;
+    align-items: center;
+}
+  
+.logo-circle {
+    width: 30px;
+    height: 30px;
+    background-color: #d3a4e3;
+    border-radius: 50%;
+    margin-right: 10px;
+    cursor: pointer;
+}
+  
+.logo-circle:hover {
+    background-color: #8440b0;
+}
+  
+.nav-links {
+    display: flex;
+    list-style: none;
+    margin-right: 75px;
+}
+  
+.nav-links li {
+    margin-left: 20px;
+}
+  
+.nav-links a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 600;
+}
+  
+.nav-links a:hover {
+    color: #9c54c9;
+}
+  
+.user-profile {
+    width: 32px;
+    height: 30px;
+    background-color: #9c54c9;
+    border-radius: 50%;
+    margin-left: 15px;
+    background-image: url(user.png);
+    cursor: pointer;
+}
+  
+.profile-dropdown {
+    position: absolute;
+    top: 50px;
+    right: 20px;
+    background-color: white;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    width: 150px;
+    display: none;
+    z-index: 100;
+}
+  
+.profile-dropdown.show {
+    display: block;
+}
+  
+.dropdown-item {
+    padding: 12px 15px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+  
+.dropdown-item:hover {
+    background-color: #f5f5f5;
+}
+
+.container2 {
+    max-width: 500px;
+    margin: 20px auto;
+    padding: 0 15px;
+}
+
+/* Image Slider */
+.slider-container {
+    position: relative;
+    width: 100%;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.slider {
+    width: 100%;
+    height: 200px;
+    position: relative;
+    overflow: hidden;
+}
+
+.slider-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.slider-img.active {
+    opacity: 1;
+}
+
+.slider-indicators {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+}
+
+.indicator {
+    width: 10px;
+    height: 10px;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.indicator.active {
+    background-color: white;
+}
+
+/* Bus Details Card */
+.bus-details {
+    background-color: white;
+    border-radius: 10px;
+    margin-top: 20px;
+    padding: 15px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.detail-row {
+    display: flex;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.detail-label {
+    font-weight: bold;
+    width: 100px;
+    color: #555;
+}
+
+.detail-value {
+    color: #333;
+    flex-grow: 1;
+}
+
+.book-button {
+    background-color: #b690e7;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 20px;
+    width: 100%;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.book-button:hover {
+    background-color: #9f75db;
+}
+
+/* Footer */
+.footer {
+    background-color: #b690e7;
+    height: 50px;
+    margin-top: 20px;
+    width: 100%;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .nav-links {
+        display: none;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        width: 100%;
+        background-color: white;
+        flex-direction: column;
+        padding: 20px;
+        box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+    }
+    
+    .nav-links.active {
+        display: flex;
+    }
+    
+    .nav-links li {
+        margin: 10px 0;
+    }
+}
+@media (max-width: 480px) {
+    .slider {
+        height: 150px;
+    }
+}
+
+@media (min-width: 768px) {
+    .slider {
+        height: 250px;
+    }
+}
