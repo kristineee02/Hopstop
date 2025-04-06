@@ -1,15 +1,10 @@
-<?php
- session_start();
-
- include('database.php');
-?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="User_account_seatSelection.css">
+    <link rel="stylesheet" href="../style/User_account_seatSelection.css">
     <title>HopStop - Seat Selection</title>
 </head>
 <body>
@@ -36,7 +31,7 @@
                   <div class="dropdown-item">Logout</div>
               </div>
           </div>
-          <script src="Userlogout.js"></script>
+          <script src="../js/Userlogout.js"></script>
     </header>
 
     <div class="container4">

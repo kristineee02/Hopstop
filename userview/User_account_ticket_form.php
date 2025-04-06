@@ -1,15 +1,10 @@
-<?php
- session_start();
-
- include('database.php');
-?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="User_account_ticket_form.css">
+    <link rel="stylesheet" href="../style/User_account_ticket_form.css">
     <title>HopStop - Ticket Form</title>
 </head>
 <body>
@@ -43,8 +38,8 @@
         <!-- Image Slider -->
         <div class="slider-container">
             <div class="slider" id="imageSlider">
-                <img src="images/bus1.png" alt="Bus Image 1" class="slider-img active" id="img1">
-                <img src="images/ceres1.png" alt="Bus Image 2" class="slider-img" id="img2">
+                <img src="../images/bus1.png" alt="Bus Image 1" class="slider-img active" id="img1">
+                <img src="../images/ceres1.png" alt="Bus Image 2" class="slider-img" id="img2">
                 <div class="slider-indicators">
                     <div class="indicator active" onclick="changeSlide(0)"></div>
                     <div class="indicator" onclick="changeSlide(1)"></div>

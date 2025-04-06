@@ -2,12 +2,13 @@
 session_start();
 $results = isset($_SESSION['search_results']) ? $_SESSION['search_results'] : null;
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="booking.css" />
+  <link rel="stylesheet" href="../style/booking.css" />
   <title>HopStop - Booking Results</title>
 </head>
 <body>
@@ -34,11 +35,11 @@ $results = isset($_SESSION['search_results']) ? $_SESSION['search_results'] : nu
         <div class="dropdown-item">Logout</div>
       </div>
     </div>
-    <script src="Userlogout.js"></script>
+    <script src="../js/Userlogout.js"></script>
   </header>
 
   <div class="header-container">
-    <img src="images/Homepage_image1.png" alt="Bus Interior" class="header-image" />
+    <img src="../images/Homepage_image1.png" alt="Bus Interior" class="header-image" />
     </div>
     <div class="search-box">
       <h2>From → To travel location</h2>
