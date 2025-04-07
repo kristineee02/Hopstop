@@ -1,35 +1,52 @@
 <?php
- session_start();
+session_start();
 
- include('../api/database.php');
+try {
+  $pdo = new PDO('mysql:host=localhost;dbname=signup', 'root', '');
+  $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+  die("Connection failed: " . $e->getMessage());
+}
 
+if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['submit'])) {
+    $from = $_POST['from'];
+    $to = $_POST['to'];
 
- if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['submit'])) {
-  $from = mysqli_real_escape_string($con, $_POST['from']);
-  $to = mysqli_real_escape_string($con, $_POST['to']);
-
-  if (!empty($from) && !empty($to)) {
-      $query = "SELECT * FROM bus WHERE location = '$from' AND destination = '$to'";
-      $result = mysqli_query($con, $query);
-
-      $_SESSION['search_results'] = [];
-      if ($result && mysqli_num_rows($result) > 0) {
-          while ($row = mysqli_fetch_assoc($result)) {
-              $_SESSION['search_results'][] = $row;
+    if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['submit'])) {
+      $from = $_POST['from'];
+      $to = $_POST['to'];
+  
+      if (!empty($from) && !empty($to)) {
+          try {
+              $query = "SELECT DISTINCT * FROM bus WHERE location = :from AND destination = :to";
+              $stmt = $pdo->prepare($query);
+  
+              $stmt->bindValue(':from', $from, PDO::PARAM_STR);
+              $stmt->bindValue(':to', $to, PDO::PARAM_STR);
+  
+              $stmt->execute();
+              
+  
+              $_SESSION['search_results'] = [];
+              if ($stmt->rowCount() > 0) {
+                  $_SESSION['search_results'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+              } else {
+                  $_SESSION['search_results'] = "No tickets available for this route.";
+              }
+  
+              header("Location: User_account_booking.php");
+              exit();
+          } catch (PDOException $e) {
+              die("Database error: " . $e->getMessage());
           }
       } else {
-          $_SESSION['search_results'] = "No tickets available for this route.";
+          echo "<script>alert('Please fill in both fields'); window.history.back();</script>";
+          exit();
       }
-
-      header("Location: User_account_booking.php");
-      exit();
-  } else {
-      echo "<script>alert('Please fill in both fields'); window.history.back();</script>";
-      exit();
   }
 }
- 
 ?>
+
 
 
 <!DOCTYPE html>
@@ -83,7 +100,7 @@
       <div class="search-fields">
         <div class="search-field">
 
-          <form method="POST">
+          <form method="POST" action="User.php">
           <label>From</label>
           <input type="text" name="from" placeholder="Enter your Location" required>
         </div>

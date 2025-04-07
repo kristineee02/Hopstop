@@ -80,7 +80,7 @@ header {
     background-color: #9c54c9;
     border-radius: 50%;
     margin-left: 15px;
-    background-image: url(user.png);
+    background-image: url(../images/user.png);
     cursor: pointer;
 }
   

@@ -5,34 +5,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../style/User_account_ticket_form.css">
+    <script src="../js/Userlogout.js"></script>
     <title>HopStop - Ticket Form</title>
 </head>
 <body>
-    <header>
-        <div class="container nav-container">
+<div id="main-container">
+        <header>
+          <div class="container nav-container">
               <div class="logo">
-                <div class="logo-circle"></div>
-                <span><b>HopStop</b></span>
+                  <div class="logo-circle"></div>
+                  <span><b>HopStop</b></span>
               </div>
               <nav>
                   <ul class="nav-links">
-                    <li><a href="User.php">Home</a></li>
-                    <li><a href="About.php">About</a></li>
-                    <li><a href="contact.php">Contact</a></li>
+                      <li><a href="User.php">Home</a></li>
+                      <li><a href="About.php">About</a></li>
+                      <li><a href="contact.php">Contact</a></li>
                   </ul>
               </nav>
-       
+             
               <div class="user-profile" id="profileButton">
-                 <i class ="fas fa-user-circle"></i>
+                  <i class ="fas fa-user-circle"></i>
               </div>
-       
+             
               <div class="profile-dropdown" id="profileDropdown">
                   <div class="dropdown-item">Profile</div>
-                  <div class="dropdown-item">Logout</div>
+                  <div class="dropdown-item" onclick="logOut()">Logout</div>
               </div>
           </div>
-          <script src="Userlogout.js"></script>
-    </header>
+        </header>   
+ 
 
     <div class="container3">
         <!-- Image Slider -->

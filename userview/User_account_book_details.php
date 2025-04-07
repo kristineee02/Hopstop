@@ -1,3 +1,30 @@
+<?php
+session_start();
+include '../api/database.php';
+include '../class/bus.php';
+
+// Get bus details from URL parameter
+$bus_id = isset($_GET['id']) ? $_GET['id'] : null;
+$bus_details = null;
+
+if ($bus_id) {
+    try {
+        $database = new Database();
+        $db = $database->getConnection();
+        
+        $query = "SELECT DISTINCT * FROM bus WHERE id = :id";
+        $stmt = $db->prepare($query);
+        $stmt->bindValue(':id', $bus_id, PDO::PARAM_INT);
+        $stmt->execute();
+        
+        if ($stmt->rowCount() > 0) {
+            $bus_details = $stmt->fetch(PDO::FETCH_ASSOC);
+        }
+    } catch (PDOException $e) {
+        die("Database error: " . $e->getMessage());
+    }
+}
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -10,32 +37,29 @@
 <body>
     <header>
         <div class="container nav-container">
-              <div class="logo">
+            <div class="logo">
                 <div class="logo-circle"></div>
                 <span><b>HopStop</b></span>
-              </div>
-              <nav>
-                  <ul class="nav-links">
+            </div>
+            <nav>
+                <ul class="nav-links">
                     <li><a href="User.php">Home</a></li>
                     <li><a href="About.php">About</a></li>
                     <li><a href="contact.php">Contact</a></li>
-                  </ul>
-              </nav>
-       
-              <div class="user-profile" id="profileButton">
-                 <i class ="fas fa-user-circle"></i>
-              </div>
-       
-              <div class="profile-dropdown" id="profileDropdown">
-                  <div class="dropdown-item">Profile</div>
-                  <div class="dropdown-item">Logout</div>
-              </div>
-          </div>
-          <script src="../js/Userlogout.js"></script>
-      </header>
+                </ul>
+            </nav>
+            <div class="user-profile" id="profileButton">
+                <i class="fas fa-user-circle"></i>
+            </div>
+            <div class="profile-dropdown" id="profileDropdown">
+                <div class="dropdown-item">Profile</div>
+                <div class="dropdown-item">Logout</div>
+            </div>
+        </div>
+        <script src="../js/Userlogout.js"></script>
+    </header>
 
-      <div class="container2">
-        <!-- Image Slider -->
+    <div class="container2">
         <div class="slider-container">
             <div class="slider" id="imageSlider">
                 <img src="../images/bus1.png" alt="Bus Image 1" class="slider-img active" id="img1">
@@ -47,68 +71,63 @@
             </div>
         </div>
 
-        <!-- Bus Details -->
-        <div class="bus-details">
-            <div class="detail-row">
-                <div class="detail-label">BUS ID:</div>
-                <div class="detail-value">NO-012-123</div>
-            </div>
-            <div class="detail-row">
-                <div class="detail-label">Date:</div>
-                <div class="detail-value">August 2, 2025</div>
-            </div>
-            <div class="detail-row">
-                <div class="detail-label">From:</div>
-                <div class="detail-value">Zamboanga</div>
-            </div>
-            <div class="detail-row">
-                <div class="detail-label">To:</div>
-                <div class="detail-value">Manila</div>
-            </div>
-            <div class="detail-row">
-                <div class="detail-label">Departure:</div>
-                <div class="detail-value">6AM</div>
-            </div>
-            <div class="detail-row">
-                <div class="detail-label">Arrival:</div>
-                <div class="detail-value">10PM</div>
-            </div>
-            <div class="detail-row">
-                <div class="detail-label">Bus Type:</div>
-                <div class="detail-value">Air-conditioned</div>
-            </div>
-            <div class="detail-row">
-                <div class="detail-label">Price:</div>
-                <div class="detail-value">P750</div>
-            </div>
-            <div class="detail-row">
-                <div class="detail-label">Available Seats:</div>
-                <div class="detail-value">10</div>
-            </div>
+        <div class="bus-details" id="bus">
+            <?php if ($bus_details): ?>
+                <div class="detail-row">
+                    <div class="detail-label">BUS ID:</div>
+                    <div class="detail-value"><?php echo htmlspecialchars($bus_details['id']); ?></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">From:</div>
+                    <div class="detail-value"><?php echo htmlspecialchars($bus_details['location']); ?></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">To:</div>
+                    <div class="detail-value"><?php echo htmlspecialchars($bus_details['destination']); ?></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Departure:</div>
+                    <div class="detail-value"><?php echo htmlspecialchars($bus_details['departure_time']); ?></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Arrival:</div>
+                    <div class="detail-value"><?php echo htmlspecialchars($bus_details['arrival_time']); ?></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Bus Type:</div>
+                    <div class="detail-value"><?php echo htmlspecialchars($bus_details['bus_type']); ?></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Price:</div>
+                    <div class="detail-value">$<?php echo htmlspecialchars($bus_details['price']); ?></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Available Seats:</div>
+                    <div class="detail-value"><?php echo isset($bus_details['available_seats']) ? htmlspecialchars($bus_details['available_seats']) : 'N/A'; ?></div>
+                </div>
 
-            <button class="book-button" onclick="redirectToTicketForm()">Book now</button>
-            
+                <button class="book-button" onclick="redirectToTicketForm(<?php echo $bus_details['id']; ?>)">Book now</button>
+            <?php else: ?>
+                <div class="no-details">No bus details available. Please select a bus from the booking page.</div>
+                <a href="User_account_booking.php" class="back-button">Go back to search</a>
+            <?php endif; ?>
         </div>
     </div>
 
-    <!-- Footer -->
     <div class="footer"></div>
 
     <script>
-        // Image slider functionality
         let currentSlide = 0;
         const slides = document.querySelectorAll('.slider-img');
         const indicators = document.querySelectorAll('.indicator');
         const totalSlides = slides.length;
         let slideInterval;
 
-        // Function to change slide
         function changeSlide(index) {
             currentSlide = index;
             updateSlider();
         }
 
-        // Update the slider to show the current slide
         function updateSlider() {
             slides.forEach((slide, index) => {
                 if (index === currentSlide) {
@@ -127,39 +146,33 @@
             });
         }
 
-        // Auto-slide functionality
         function startAutoSlide() {
             slideInterval = setInterval(() => {
                 currentSlide = (currentSlide + 1) % totalSlides;
                 updateSlider();
-            }, 5000); // Change slide every 5 seconds
+            }, 5000);
         }
 
-        // Pause auto-slide on hover
         const sliderContainer = document.querySelector('.slider-container');
         sliderContainer.addEventListener('mouseenter', () => {
             clearInterval(slideInterval);
         });
 
-        // Resume auto-slide when mouse leaves
         sliderContainer.addEventListener('mouseleave', () => {
             startAutoSlide();
         });
 
-        // Start the auto-slider
         startAutoSlide();
 
-        // Manual slide change with indicators
         indicators.forEach((indicator, index) => {
             indicator.addEventListener('click', () => {
                 changeSlide(index);
             });
         });
 
-        function redirectToTicketForm() {
-            window.location.href = "User_account_ticket_form.php";
+        function redirectToTicketForm(bus_id) {
+            window.location.href = "User_account_ticket_form.php?bus_id=" + bus_id;
         }
     </script>
-
 </body>
 </html>
