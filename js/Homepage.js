@@ -19,7 +19,8 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        alert(`Searching for buses from ${from} to ${to}`);
+        alert(`Create an account or log in to search for tickets.`);
+        window.location.href = "../signup/SignUp.php"; 
     });
     
     const scrollbtn = document.getElementById('scroll-down');

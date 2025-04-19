@@ -23,7 +23,7 @@
                     <li><a href="Contactpage.php">Contact</a></li>
                 </ul>
             </nav>
-            <button class="login-btn">Log In</button>
+            <button class="login-btn" onclick="login()">Log In</button>
         </div>
     </header>
       

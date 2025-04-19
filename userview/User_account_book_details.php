@@ -1,7 +1,7 @@
 <?php
 session_start();
 include '../api/database.php';
-include '../class/bus.php';
+include '../class/Bus.php';
 
 // Get bus details from URL parameter
 $bus_id = isset($_GET['id']) ? $_GET['id'] : null;
@@ -12,9 +12,9 @@ if ($bus_id) {
         $database = new Database();
         $db = $database->getConnection();
         
-        $query = "SELECT DISTINCT * FROM bus WHERE id = :id";
+        $query = "SELECT DISTINCT * FROM Bus WHERE id = :id";
         $stmt = $db->prepare($query);
-        $stmt->bindValue(':id', $bus_id, PDO::PARAM_INT);
+        $stmt->bindValue(':id', $bus_id, PDO::PARAM_STR);
         $stmt->execute();
         
         if ($stmt->rowCount() > 0) {
@@ -99,7 +99,7 @@ if ($bus_id) {
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Price:</div>
-                    <div class="detail-value">$<?php echo htmlspecialchars($bus_details['price']); ?></div>
+                    <div class="detail-value">PHP <?php echo htmlspecialchars($bus_details['price']); ?></div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Available Seats:</div>

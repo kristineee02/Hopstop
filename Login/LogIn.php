@@ -13,8 +13,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['submit'])) {
 
     $user->login($email, $password);
     header("Location: ../userview/User.php");
-
-}
+    exit();
+    }
 ?>
 
 

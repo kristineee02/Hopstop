@@ -19,3 +19,7 @@
     //    mobileNav.classList.remove('active');
     //});
 //});
+
+function login() {
+  window.location.href = "../Login/LogIn.php"; 
+}

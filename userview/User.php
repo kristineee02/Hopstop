@@ -26,7 +26,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['submit'])) {
   
               $stmt->execute();
               
-  
               $_SESSION['search_results'] = [];
               if ($stmt->rowCount() > 0) {
                   $_SESSION['search_results'] = $stmt->fetchAll(PDO::FETCH_ASSOC);

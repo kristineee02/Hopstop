@@ -21,7 +21,7 @@ function logOut() {
     let confirmLogout = confirm("Are you sure you want to log out?");
     
     if (confirmLogout) {
-        window.location.href = "Homepage.php";
+        window.location.href = "../homepage/Homepage.php";
         sessionStorage.clear();
     }
 }

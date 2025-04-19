@@ -41,3 +41,6 @@ const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
             });
         });
     
+        function login() {
+            window.location.href = "../Login/LogIn.php"; 
+    }
