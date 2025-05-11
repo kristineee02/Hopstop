@@ -1,0 +1,16 @@
+create table admin(
+    admin_id INT AUTO_INCREMET PRIMARY KEY,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    email VARCHAR(50),
+    password VARCHAR(255)
+);
+
+create table passenger(
+    passenger_id INT AUTO_INCREMET PRIMARY KEY,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    email VARCHAR(50),
+    password VARCHAR(255),
+    picture VARCHAR(255)
+);

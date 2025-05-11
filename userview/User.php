@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['submit'])) {
           </div>
          
           <div class="profile-dropdown" id="profileDropdown">
-              <div class="dropdown-item">Profile</div>
+              <div class="dropdown-item" onclick="profile()">Profile</div>
               <div class="dropdown-item" onclick="logOut()">Logout</div>
           </div>
       </div>

@@ -57,7 +57,7 @@ $results = isset($_SESSION['search_results']) ? $_SESSION['search_results'] : nu
               echo "<p class='trip-route'>Route: " . htmlspecialchars($bus['location']) . " → " . htmlspecialchars($bus['destination']) . "</p>";
               echo "<p class='trip-time'>Departure: " . htmlspecialchars($bus['departure_time']) . "</p>";
               echo "<p class='trip-time'>Arrival: " . htmlspecialchars($bus['arrival_time']) . "</p>";
-              echo "<p class='trip-price'>Price: $" . htmlspecialchars($bus['price']) . "</p>";
+              echo "<p class='trip-price'>Price: PHP" . htmlspecialchars($bus['price']) . "</p>";
               echo "</div>";
               echo '<button class="book-button" onclick="window.location.href=\'User_account_book_details.php?id=' . htmlspecialchars($bus['id']) . '\';">Book now</button>';
               echo "</div>";

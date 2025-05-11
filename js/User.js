@@ -25,3 +25,7 @@ function logOut() {
         sessionStorage.clear();
     }
 }
+
+function profile(){
+    window.location.href = "user_profile.php";
+}

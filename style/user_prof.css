@@ -362,3 +362,179 @@ h2 {
 .dropdown-menu1.show {
     display: block;
 }
+
+/*user-profile*/
+/* Modal Styles for HopStop Dashboard */
+
+/* Modal Background */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+/* Modal Display State */
+.modal.show {
+    display: block;
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Modal Content Box */
+.modal-content {
+    position: relative;
+    background-color: #ffffff;
+    margin: 10% auto;
+    padding: 30px;
+    width: 50%;
+    max-width: 500px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    transform: translateY(-20px);
+    transition: all 0.3s ease;
+    animation: modalOpen 0.4s forwards;
+}
+
+/* Modal Animation */
+@keyframes modalOpen {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Close Button */
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    color: #888;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.close:hover {
+    color: #333;
+}
+
+/* Modal Header */
+.modal-content h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 24px;
+    text-align: center;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+/* Form Styling */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Form Labels */
+.form-group label {
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+/* Form Inputs */
+.form-group input[type="text"] {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: border 0.3s ease;
+}
+
+.form-group input[type="text"]:focus {
+    border-color: #4a7bff;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(74, 123, 255, 0.2);
+}
+
+/* File Input Styling */
+.file-input {
+    margin-top: 10px;
+}
+
+.file-input label {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.file-input input[type="file"] {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 8px;
+    width: 100%;
+    background-color: #f9f9f9;
+}
+
+/* Save Button */
+.button-edit {
+    background-color: #D2B2FA;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    width: 100%;
+    margin-top: 25px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+.button-edit:hover {
+    background-color: rgb(196, 58, 230);
+}
+
+.button-edit:active {
+    transform: scale(0.98);
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+    .modal-content {
+        width: 85%;
+        margin: 15% auto;
+        padding: 20px;
+    }
+    
+    .form-group input[type="text"] {
+        padding: 10px;
+    }
+    
+    .button-edit {
+        padding: 10px 15px;
+    }
+}
+
+
+
