@@ -69,10 +69,9 @@ function closeCreateModal() {
     document.getElementById("createBusModal").style.display = "none";
 }
 
-function openUpdateModal(id, bus_number, location, destination, departure_time, arrival_time, bus_type, price, available_seats, status) {
+function openUpdateModal(id, location, destination, departure_time, arrival_time, available_seats, bus_type, price, bus_number, status) {
     // Set form values
     document.getElementById("editBusId").value = id;
-    document.getElementById("editNumber").value = bus_number;
     document.getElementById("editlocation-select").value = location;
     document.getElementById("editdestination-select").value = destination;
     
@@ -84,11 +83,12 @@ function openUpdateModal(id, bus_number, location, destination, departure_time, 
         console.error("Error formatting dates:", e);
         document.getElementById("editdepartureTime").value = departure_time;
         document.getElementById("editarrivalTime").value = arrival_time;
+        document.getElementById("editavailableSeats").value = available_seats;
     }
     
     document.getElementById("editbusType").value = bus_type;
     document.getElementById("editprice").value = price;
-    document.getElementById("editavailableSeats").value = available_seats;
+    document.getElementById("editNumber").value = bus_number;
     document.getElementById("editStatus").value = status;
 
     // Show the modal
