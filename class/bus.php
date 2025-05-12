@@ -1,164 +1,133 @@
 <?php
 class Bus {
     private $conn;
-    private $table = 'buses';
+    private $table = 'bus'; 
+
     public function __construct($db) {
         $this->conn = $db;
     }
 
-   
     public function getAllBusDetails() {
         try {
-            $query = "SELECT * FROM " . $this->table;
+            $query = "SELECT bus_id, bus_number, location, destination, bus_type, 
+                            departure_time, arrival_time, available_seats, price, status 
+                      FROM " . $this->table;
             $stmt = $this->conn->prepare($query);
             $stmt->execute();
-            
-            $buses = [];
-            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $buses[] = $row;
-            }
-            
-            return $buses;
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            error_log("Database error: " . $e->getMessage());
-            return [];
+            error_log("Database error in getAllBusDetails: " . $e->getMessage());
+            throw new Exception("Failed to fetch buses: " . $e->getMessage());
         }
     }
-    
-    
+
     public function getBusById($id) {
         try {
-            $query = "SELECT * FROM " . $this->table . " WHERE bus_id = ?";
+            $query = "SELECT * FROM " . $this->table . " WHERE bus_id = :id";
             $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(1, $id);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
             $stmt->execute();
-            
             return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            error_log("Database error: " . $e->getMessage());
-            return false;
+            error_log("Database error in getBusById: " . $e->getMessage());
+            throw new Exception("Failed to fetch bus: " . $e->getMessage());
         }
     }
-    
-    
+
     public function getFilteredBuses($filters) {
         try {
             $query = "SELECT * FROM " . $this->table . " WHERE 1=1";
             $params = [];
-            
-            if (isset($filters['location'])) {
-                $query .= " AND location = ?";
-                $params[] = $filters['location'];
+
+            if (!empty($filters['location'])) {
+                $query .= " AND location = :location";
+                $params[':location'] = $filters['location'];
             }
-            
-            if (isset($filters['destination'])) {
-                $query .= " AND destination = ?";
-                $params[] = $filters['destination'];
+            if (!empty($filters['destination'])) {
+                $query .= " AND destination = :destination";
+                $params[':destination'] = $filters['destination'];
             }
-            
-            if (isset($filters['bus_type'])) {
-                $query .= " AND bus_type = ?";
-                $params[] = $filters['bus_type'];
+            if (!empty($filters['bus_type'])) {
+                $query .= " AND bus_type = :bus_type";
+                $params[':bus_type'] = $filters['bus_type'];
             }
-            
+
             $stmt = $this->conn->prepare($query);
-            
-            for ($i = 0; $i < count($params); $i++) {
-                $stmt->bindValue($i + 1, $params[$i]);
-            }
-            
-            $stmt->execute();
-            
-            $buses = [];
-            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $buses[] = $row;
-            }
-            
-            return $buses;
+            $stmt->execute($params);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            error_log("Database error: " . $e->getMessage());
-            return [];
+            error_log("Database error in getFilteredBuses: " . $e->getMessage());
+            throw new Exception("Failed to fetch filtered buses: " . $e->getMessage());
         }
     }
 
-  
-    public function createNewBus($location, $destination, $date, $time, $bus_type, $price, $available_seats, $bus_number) {
+    public function createNewBus( $location, $destination, $departure_time, 
+                               $arrival_time, $available_seats, $bus_type, $price, $bus_number, $status) {
         try {
-            // Parse datetime-local inputs
-            $date = date('Y-m-d', strtotime($date));
-            $time = date('H:i:s', strtotime($time));
-    
-            $query = "INSERT INTO " . $this->table . " (location, destination, date, time, bus_type, price, available_seats, bus_number)
-                      VALUES (:location, :destination, :date, :time, :bus_type, :price, :available_seats, :bus_number)";
+            $query = "INSERT INTO " . $this->table . " 
+                     (location, destination, departure_time, arrival_time,  available_seats,
+                      bus_type, price, bus_number,  status)
+                     VALUES ( :location, :destination, :departure_time, 
+                            :arrival_time, :available_seats, :bus_type, :price, :bus_number,  :status)";
+
             $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':location', $location);
-            $stmt->bindParam(':destination', $destination);
-            $stmt->bindParam(':date', $date);
-            $stmt->bindParam(':time', $time);
-            $stmt->bindParam(':bus_type', $bus_type);
-            $stmt->bindParam(':price', $price);
-            $stmt->bindParam(':available_seats', $available_seats);
-            $stmt->bindParam(':bus_number', $bus_number);
-            
-            return $stmt->execute();
+            $params = [
+                ':location' => $location,
+                ':destination' => $destination,
+                ':departure_time' => $departure_time,
+                ':arrival_time' => $arrival_time,
+                ':available_seats' => $available_seats,
+                ':bus_type' => $bus_type,
+                ':price' => $price,
+                ':bus_number' => $bus_number,
+                ':status' => $status
+            ];
+            return $stmt->execute($params);
         } catch (PDOException $e) {
             error_log("Database error in createNewBus: " . $e->getMessage());
-            return false;
+            throw new Exception("Failed to create bus: " . $e->getMessage());
         }
     }
-  
-    public function updateBus($id, $location, $destination, $date, $time, $bus_type, $price, $available_seats, $bus_number) {
+
+    public function updateBus($id, $location, $destination, $departure_time, 
+                            $arrival_time,  $available_seats, $bus_type, $price,  $bus_number, $status) {
         try {
             $query = "UPDATE " . $this->table . " 
-                    SET location = ?, destination = ?, date = ?, time = ?, 
-                        bus_type = ?, price = ?, available_seats = ?, bus_number = ? 
-                    WHERE bus_id = ?";
-            
+                     SET location = :location, 
+                         destination = :destination, departure_time = :departure_time,
+                         arrival_time = :arrival_time, available_seats = :available_seats, 
+                         bus_type = :bus_type, price = :price, bus_number = :bus_number, 
+                         status = :status WHERE bus_id = :id";
+
             $stmt = $this->conn->prepare($query);
-            
-           
-            $stmt->bindParam(1, $location);
-            $stmt->bindParam(2, $destination);
-            $stmt->bindParam(3, $date);
-            $stmt->bindParam(4, $time);
-            $stmt->bindParam(5, $bus_type);
-            $stmt->bindParam(6, $price);
-            $stmt->bindParam(7, $available_seats);
-            $stmt->bindParam(8, $bus_number);
-            $stmt->bindParam(9, $id);
-            
-            return $stmt->execute();
+            $params = [
+                ':location' => $location,
+                ':destination' => $destination,
+                ':departure_time' => $departure_time,
+                ':arrival_time' => $arrival_time,
+                ':available_seats' => $available_seats,
+                ':bus_type' => $bus_type,
+                ':price' => $price,
+                ':bus_number' => $bus_number,
+                ':status' => $status,
+                ':id' => $id
+            ];
+            return $stmt->execute($params);
         } catch (PDOException $e) {
-            error_log("Database error: " . $e->getMessage());
-            return false;
+            error_log("Database error in updateBus: " . $e->getMessage());
+            throw new Exception("Failed to update bus: " . $e->getMessage());
         }
     }
-    
-   
+
     public function deleteBus($id) {
         try {
-            // Check if bus exists
-            $checkQuery = "SELECT COUNT(*) FROM " . $this->table . " WHERE bus_id = ?";
-            $checkStmt = $this->conn->prepare($checkQuery);
-            $checkStmt->bindParam(1, $id);
-            $checkStmt->execute();
-            $count = $checkStmt->fetchColumn();
-    
-            if ($count == 0) {
-                error_log("Delete failed: Bus with ID $id not found");
-                return false;
-            }
-    
-            $query = "DELETE FROM " . $this->table . " WHERE bus_id = ?";
+            $query = "DELETE FROM " . $this->table . " WHERE bus_id = :id";
             $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(1, $id);
-            
-            $result = $stmt->execute();
-            error_log("Bus deletion for ID $id " . ($result ? "succeeded" : "failed"));
-            return $result;
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            return $stmt->execute();
         } catch (PDOException $e) {
             error_log("Database error in deleteBus: " . $e->getMessage());
-            return false;
+            throw new Exception("Failed to delete bus: " . $e->getMessage());
         }
     }
 }

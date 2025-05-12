@@ -11,7 +11,6 @@ $database = new Database();
 $db = $database->getConnection();
 $bus = new Bus($db);
 
-
 if (!$db) {
     echo json_encode(["status" => "error", "message" => "Database connection failed"]);
     exit;
@@ -51,80 +50,81 @@ switch ($method) {
             exit;
         }
 
-        case 'POST':
-            if (!isset($inputData['location'], $inputData['destination'], $inputData['date'], 
-                      $inputData['time'], $inputData['bus_type'], $inputData['price'], 
-                      $inputData['available_seats'], $inputData['bus_number'])) {
-                echo json_encode(["status" => "error", "message" => "Missing required fields"]);
-                exit;
-            }
-        
-            $result = $bus->createNewBus(
-                $inputData['location'],
-                $inputData['destination'],
-                $inputData['date'],
-                $inputData['time'],
-                $inputData['bus_type'],
-                $inputData['price'],
-                $inputData['available_seats'],
-                $inputData['bus_number']
-            );
-        
-            if ($result) {
-                echo json_encode(["status" => "success", "message" => "Bus created successfully"]);
-            } else {
-                echo json_encode(["status" => "error", "message" => "Failed to create bus"]);
-            }
+    case 'POST':
+        if (!isset($inputData['location'], $inputData['destination'], 
+                  $inputData['departure_time'], $inputData['arrival_time'], $inputData['available_seats'], $inputData['bus_type'], 
+                  $inputData['price'], $inputData['bus_number'], $inputData['status'])) {
+            echo json_encode(["status" => "error", "message" => "Missing required fields"]);
             exit;
+        }
+    
+        $result = $bus->createNewBus(
+            $inputData['location'],
+            $inputData['destination'],
+            $inputData['departure_time'],
+            $inputData['arrival_time'],
+            $inputData['available_seats'],
+            $inputData['bus_type'],
+            $inputData['price'],
+            $inputData['bus_number'],
+            $inputData['status']
+        );
+    
+        if ($result) {
+            echo json_encode(["status" => "success", "message" => "Bus created successfully"]);
+        } else {
+            echo json_encode(["status" => "error", "message" => "Failed to create bus"]);
+        }
+        exit;
 
-        case 'PUT':
-                if (!isset($inputData['id'], $inputData['location'], $inputData['destination'], 
-                           $inputData['date'], $inputData['time'], $inputData['bus_type'], 
-                           $inputData['price'], $inputData['available_seats'], $inputData['bus_number'])) {
-                    echo json_encode(["status" => "error", "message" => "Missing required fields for update"]);
-                    exit;
-                }
-            
-                $result = $bus->updateBus(
-                    $inputData['id'],
-                    $inputData['location'],
-                    $inputData['destination'],
-                    $inputData['date'],
-                    $inputData['time'],
-                    $inputData['bus_type'],
-                    $inputData['price'],
-                    $inputData['available_seats'],
-                    $inputData['bus_number']
-                );
-            
-                if ($result) {
-                    echo json_encode(["status" => "success", "message" => "Bus updated successfully"]);
-                } else {
-                    echo json_encode(["status" => "error", "message" => "Failed to update bus"]);
-                }
-                exit;
+    case 'PUT':
+        if (!isset($inputData['id'], $inputData['location'], $inputData['destination'], 
+                  $inputData['departure_time'], $inputData['arrival_time'],  $inputData['available_seats'],
+                   $inputData['bus_type'], $inputData['price'], $inputData['bus_number'], $inputData['status'])) {
+            echo json_encode(["status" => "error", "message" => "Missing required fields for update"]);
+            exit;
+        }
+    
+        $result = $bus->updateBus(
+            $inputData['id'],
+            $inputData['location'],
+            $inputData['destination'],
+            $inputData['departure_time'],
+            $inputData['arrival_time'],
+            $inputData['available_seats'],
+            $inputData['bus_type'],
+            $inputData['price'],
+            $inputData['bus_number'],
+            $inputData['status']
+        );
+    
+        if ($result) {
+            echo json_encode(["status" => "success", "message" => "Bus updated successfully"]);
+        } else {
+            echo json_encode(["status" => "error", "message" => "Failed to update bus"]);
+        }
+        exit;
 
-                case 'DELETE':
-                    if (!isset($_GET['id']) || empty($_GET['id'])) {
-                        echo json_encode(["status" => "error", "message" => "Bus ID is required for deletion"]);
-                        exit;
-                    }
-                
-                    $id = $_GET['id'];
-                    $result = $bus->deleteBus($id);
-                    if ($result) {
-                        echo json_encode(["status" => "success", "message" => "Bus deleted successfully"]);
-                    } else {
-                        // Check if bus exists to provide a specific error
-                        $checkQuery = "SELECT COUNT(*) FROM buses WHERE bus_id = ?";
-                        $checkStmt = $db->prepare($checkQuery);
-                        $checkStmt->bindParam(1, $id);
-                        $checkStmt->execute();
-                        $count = $checkStmt->fetchColumn();
-                
-                        $message = $count == 0 ? "Bus with ID $id not found" : "Failed to delete bus due to database error";
-                        echo json_encode(["status" => "error", "message" => $message]);
-                    }
-                    exit;
+    case 'DELETE':
+        if (!isset($_GET['id']) || empty($_GET['id'])) {
+            echo json_encode(["status" => "error", "message" => "Bus ID is required for deletion"]);
+            exit;
+        }
+    
+        $id = $_GET['id'];
+        $result = $bus->deleteBus($id);
+        if ($result) {
+            echo json_encode(["status" => "success", "message" => "Bus deleted successfully"]);
+        } else {
+            $checkQuery = "SELECT COUNT(*) FROM bus WHERE bus_id = ?";
+            $checkStmt = $db->prepare($checkQuery);
+            $checkStmt->bindParam(1, $id);
+            $checkStmt->execute();
+            $count = $checkStmt->fetchColumn();
+    
+            $message = $count == 0 ? "Bus with ID $id not found" : "Failed to delete bus due to database error";
+            echo json_encode(["status" => "error", "message" => $message]);
+        }
+        exit;
 }
 ?>

@@ -68,12 +68,10 @@
         </div>
     </div>
 
-   
-
     <div class="container">
         <div class="table-container">
             <div class="page-header">
-                <div class="page-title">Freakin Bus</div>
+                <div class="page-title">Bus Management</div>
                 <button class="create-btn" onclick="openCreateBusModal()">Add Bus</button>
             </div>
             <div class="search-filter">
@@ -105,10 +103,11 @@
                         <th>Destination</th>
                         <th>Departure</th>
                         <th>Arrival</th>
+                        <th>Available Seats</th>
                         <th>Type</th>
                         <th>Price</th>
-                        <th>Available Seats</th>
                         <th>Bus Number</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody id="BusTableBody">
@@ -118,6 +117,7 @@
         </div>
     </div>
 
+
     <!-- Create Bus Modal -->
     <div id="createBusModal" class="modal">
     <div class="modal-content">
@@ -126,6 +126,10 @@
         <div class="form-grid">
             <div class="form">
                 <input type="number" id="busNum" placeholder="Bus Number">
+                <select id="status">
+                    <option value="Available">Available</option>
+                    <option value="Unavailable">Unavailable</option>
+                </select>
             </div>
             <div class="form-group">
                 <select id="location-select">
@@ -170,6 +174,10 @@
             <div class="form">
                 <input type="number" id="editBusId" placeholder="Bus Id" readonly>
                 <input type="number" id="editNumber" placeholder="Bus Number">
+                <select id="editStatus">
+                    <option value="Available">Available</option>
+                    <option value="Unavailable">Unavailable</option>
+                </select>
             </div>
 
             <div class="form-grid">

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 11, 2025 at 06:17 PM
+-- Generation Time: May 12, 2025 at 09:31 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `hotspotdb`
+-- Database: `hopstopdb`
 --
 
 -- --------------------------------------------------------
@@ -28,7 +28,7 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `admin` (
-  `admin_id` int(11) AUTO_INCREMENT PRIMARY KEY,
+  `admin_id` int AUTO_INCREMENT PRIMARY KEY,
   `first_name` varchar(100) NOT NULL,
   `last_name` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
@@ -48,18 +48,20 @@ INSERT INTO `admin` (`admin_id`, `first_name`, `last_name`, `email`, `password`)
 -- Table structure for table `bookings`
 --
 
-CREATE TABLE bookings (
-  `booking_id` int(11) AUTO_INCREMENT PRIMARY KEY,
-  `passenger_id` int(11),
-  `bus_id` int(11),
-  'reserve_name' VARCHAR (100) NOT NULL,
+CREATE TABLE `bookings` (
+  `booking_id` INT AUTO_INCREMENT PRIMARY KEY,
+  `passenger_id` INT,
+  `bus_id` INT,
+  `reserve_name` varchar(100) NOT NULL,
   `passenger_type` enum('Regular','PWD/Senior Citizen','Student') NOT NULL,
   `seat_number` int(11) NOT NULL,
   `id_upload_path` varchar(255) DEFAULT NULL,
-  `remarks` text DEFAULT NULL,
+  `remarks` text NOT NULL,
+  `reference` varchar(50) NOT NULL,
   `status` enum('pending','confirmed','cancelled') NOT NULL DEFAULT 'pending',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   FOREIGN KEY(passenger_id) REFERENCES passenger(passenger_id),
-  FOREIGN KEY(bus_id) REFERENCES buses(bus_id)
+  FOREIGN KEY(bus_id) REFERENCES bus(bus_id)
 ); ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -68,16 +70,17 @@ CREATE TABLE bookings (
 -- Table structure for table `buses`
 --
 
-CREATE TABLE `buses` (
-  `bus_id` int(11) AUTO_INCREMENT PRIMARY KEY NOT NULL,
+CREATE TABLE `bus` (
+  `bus_id` INT AUTO_INCREMENT PRIMARY KEY,
   `bus_number` varchar(50) NOT NULL,
   `location` varchar(50) NOT NULL,
   `destination` varchar(50) NOT NULL,
-  `bus_type` enum('Air-conditioned','Regular') NOT NULL,
-  `date` date NOT NULL,
-  `time` time NOT NULL,
-  `available_seats` int(11) NOT NULL DEFAULT 30,
+  `bus_type` enum('Regular','Air-Conditioned') NOT NULL,
+  `departure_time` time NOT NULL,
+  `arrival_time` time NOT NULL,
+  `available_seats` int(11) NOT NULL,
   `price` decimal(10,2) NOT NULL,
+  `status` enum('Available','Unavailable') NOT NULL DEFAULT 'Available',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ); ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -85,11 +88,8 @@ CREATE TABLE `buses` (
 -- Dumping data for table `buses`
 --
 
-INSERT INTO `buses` (`bus_id`, `bus_number`, `location`, `destination`, `bus_type`, `date`, `time`, `available_seats`, `price`, `created_at`) VALUES
-(1, 'BUS1001', 'Zamboanga City', 'Pagadian City', 'Air-conditioned', '2025-05-01', '08:00:00', 30, 800.00, '2025-04-29 00:02:06'),
-(2, 'BUS1002', 'Pagadian City', 'Zamboanga City', 'Regular', '2025-05-01', '09:00:00', 30, 800.00, '2025-04-29 00:02:06'),
-(3, 'BUS1003', 'Zamboanga City', 'Dipolog', 'Air-conditioned', '2025-05-02', '10:00:00', 30, 900.00, '2025-04-29 00:02:06'),
-(4, 'BUS1004', 'Dipolog', 'Zamboanga City', 'Regular', '2025-05-03', '11:00:00', 30, 900.00, '2025-04-29 00:02:06');
+INSERT INTO `buses` (`bus_id`, `bus_number`, `location`, `destination`, `bus_type`, `date`, `departure_time`, `arrival_time`, `available_seats`, `price`, `status`, `created_at`) VALUES
+(1, '2025-0001', 'Zamboanga City', 'Pagadian City', 'Air-Conditioned', '2025-05-25', '05:00:00', '10:00:00', 30, 800.00, 'Available', '2025-05-12 07:24:01');
 
 -- --------------------------------------------------------
 
@@ -98,11 +98,11 @@ INSERT INTO `buses` (`bus_id`, `bus_number`, `location`, `destination`, `bus_typ
 --
 
 CREATE TABLE `passenger` (
-  `passenger_id` int(11) AUTO_INCREMENT PRIMARY KEY NOT NULL,
+  `passenger_id` INT AUTO_INCREMENT PRIMARY KEY,
   `first_name` varchar(50) NOT NULL,
   `last_name` varchar(50) NOT NULL,
-  `email` varchar(100) NOT NULL,
-  `password` varchar(255) NOT NULL,
+  `email` varchar(50) NOT NULL,
+  `password` varchar(50) NOT NULL,
   `picture` varchar(255) NOT NULL
 ); ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -169,7 +169,7 @@ ALTER TABLE `bookings`
 -- AUTO_INCREMENT for table `buses`
 --
 ALTER TABLE `buses`
-  MODIFY `bus_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `bus_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `passenger`

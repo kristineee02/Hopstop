@@ -22,30 +22,31 @@ function loadBus() {
             data.buses.forEach(bus => {
                 let row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${bus.bus_id}</td> <!-- Changed from bus.id to bus.bus_id -->
+                    <td>${bus.bus_id}</td>
                     <td>${bus.location}</td>
                     <td>${bus.destination}</td>
-                    <td>${bus.date}</td>
-                    <td>${bus.time}</td>
+                    <td>${bus.departure_time}</td>
+                    <td>${bus.arrival_time}</td>
+                    <td>${bus.available_seats}</td>
                     <td>${bus.bus_type}</td>
                     <td>${bus.price}</td>
-                    <td>${bus.available_seats}</td>
                     <td>${bus.bus_number}</td>
+                    <td>${bus.status}</td>
                 `;
                 
-                // Make the row clickable
                 row.style.cursor = "pointer";
                 row.onclick = function() {
                     openUpdateModal(
-                        bus.bus_id, // Changed from bus.id to bus.bus_id
+                        bus.bus_id, 
                         bus.location, 
                         bus.destination, 
-                        bus.date,
-                        bus.time, 
+                        bus.departure_time,
+                        bus.arrival_time, 
+                        bus.available_seats,
                         bus.bus_type, 
                         bus.price, 
-                        bus.available_seats,
-                        bus.bus_number
+                        bus.bus_number,
+                        bus.status
                     );
                 };
                 
@@ -68,34 +69,37 @@ function closeCreateModal() {
     document.getElementById("createBusModal").style.display = "none";
 }
 
-function openUpdateModal(id, location, destination, date, time, bus_type, price, available_seats, bus_number) {
+function openUpdateModal(id, bus_number, location, destination, departure_time, arrival_time, bus_type, price, available_seats, status) {
     // Set form values
     document.getElementById("editBusId").value = id;
     document.getElementById("editNumber").value = bus_number;
     document.getElementById("editlocation-select").value = location;
     document.getElementById("editdestination-select").value = destination;
     
-    // Handle datetime inputs
     try {
-        // Combine date and time for datetime-local input (YYYY-MM-DDThh:mm)
-        const departureDateTime = `${date}T${time.slice(0, 5)}`; // e.g., 2025-05-12T14:30
-        const arrivalDateTime = `${date}T${time.slice(0, 5)}`; // Adjust if arrival uses a different date
-        
-        document.getElementById("editdepartureTime").value = departureDateTime;
-        document.getElementById("editarrivalTime").value = arrivalDateTime;
+        // Format departure time for datetime-local input
+        document.getElementById("editdepartureTime").value = formatDateTimeForInput(departure_time);
+        document.getElementById("editarrivalTime").value = formatDateTimeForInput(arrival_time);
     } catch (e) {
         console.error("Error formatting dates:", e);
-        // Fallback to raw values if parsing fails
-        document.getElementById("editdepartureTime").value = `${date}T${time}`;
-        document.getElementById("editarrivalTime").value = `${date}T${time}`;
+        document.getElementById("editdepartureTime").value = departure_time;
+        document.getElementById("editarrivalTime").value = arrival_time;
     }
     
     document.getElementById("editbusType").value = bus_type;
     document.getElementById("editprice").value = price;
     document.getElementById("editavailableSeats").value = available_seats;
+    document.getElementById("editStatus").value = status;
 
     // Show the modal
     document.getElementById("editBusModal").style.display = "block";
+}
+
+// Helper function to format time for input fields
+function formatDateTimeForInput(timeStr) {
+    // Assuming current date since we only have time in the database
+    const today = new Date().toISOString().split('T')[0];
+    return `${today}T${timeStr}`;
 }
 
 function closeEditModal() {
@@ -104,20 +108,26 @@ function closeEditModal() {
 
 function createNewBus() {
     try {
-        const departure = document.getElementById("departureTime")?.value;
-        const arrival = document.getElementById("arrivalTime")?.value;
-        const price = document.getElementById("price")?.value;
-        const availableSeats = document.getElementById("availableSeats")?.value;
+        const departure = document.getElementById("departureTime").value;
+        const arrival = document.getElementById("arrivalTime").value;
+        const price = document.getElementById("price").value;
+        const availableSeats = document.getElementById("availableSeats").value;
+        const busNumber = document.getElementById("busNum").value;
+
+        // Extract time portion from datetime inputs
+        const departureTime = departure ? departure.split('T')[1] : '';
+        const arrivalTime = arrival ? arrival.split('T')[1] : '';
 
         const formData = {
-            location: document.getElementById("location-select")?.value,
-            destination: document.getElementById("destination-select")?.value,
-            date: departure ? departure.split('T')[0] : '',
-            time: arrival ? arrival.split('T')[1] + ':00' : '',
-            bus_type: document.getElementById("busType")?.value,
+            bus_number: busNumber,
+            location: document.getElementById("location-select").value,
+            destination: document.getElementById("destination-select").value,
+            departure_time: departureTime,
+            arrival_time: arrivalTime,
+            bus_type: document.getElementById("busType").value,
             price: price,
             available_seats: availableSeats,
-            bus_number: document.getElementById("busNum")?.value
+            status: document.getElementById("status").value
         };
 
         // Validate data
@@ -128,7 +138,6 @@ function createNewBus() {
             }
         }
 
-        // Validate numeric fields
         if (isNaN(price) || price <= 0) {
             alert("Price must be a positive number!");
             return;
@@ -160,6 +169,7 @@ function createNewBus() {
                 document.getElementById("price").value = "";
                 document.getElementById("availableSeats").value = "";
                 document.getElementById("busNum").value = "";
+                document.getElementById("status").value = "Available";
             }
         })
         .catch(error => {
@@ -171,56 +181,70 @@ function createNewBus() {
         alert("An unexpected error occurred. Check the console for details.");
     }
 }
-function updateBus() {
-    const formData = {
-        id: document.getElementById("editBusId").value, // Keep id for WHERE clause
-        bus_number: document.getElementById("editNumber").value,
-        location: document.getElementById("editlocation-select").value,
-        destination: document.getElementById("editdestination-select").value,
-        date: document.getElementById("editdepartureTime").value.split('T')[0],
-        time: document.getElementById("editarrivalTime").value.split('T')[1] + ':00',
-        bus_type: document.getElementById("editbusType").value,
-        price: document.getElementById("editprice").value,
-        available_seats: document.getElementById("editavailableSeats").value
-    };
 
-    // Validate data
-    for (const key in formData) {
-        if (!formData[key]) {
-            alert(`${key.replace('_', ' ')} is required!`);
+function updateBus() {
+    try {
+        const departure = document.getElementById("editdepartureTime").value;
+        const arrival = document.getElementById("editarrivalTime").value;
+        
+        // Extract time portion from datetime inputs
+        const departureTime = departure ? departure.split('T')[1] : '';
+        const arrivalTime = arrival ? arrival.split('T')[1] : '';
+        
+        const formData = {
+            id: document.getElementById("editBusId").value,
+            location: document.getElementById("editlocation-select").value,
+            destination: document.getElementById("editdestination-select").value,
+            departure_time: departureTime,
+            arrival_time: arrivalTime,
+            available_seats: document.getElementById("editavailableSeats").value,
+            bus_type: document.getElementById("editbusType").value,
+            price: document.getElementById("editprice").value,
+            bus_number: document.getElementById("editNumber").value,
+            status: document.getElementById("editStatus").value
+        };
+
+        // Validate data
+        for (const key in formData) {
+            if (!formData[key]) {
+                alert(`${key.replace('_', ' ')} is required!`);
+                return;
+            }
+        }
+
+        // Validate numeric fields
+        if (isNaN(formData.price) || formData.price <= 0) {
+            alert("Price must be a positive number!");
             return;
         }
-    }
-
-    // Validate numeric fields
-    if (isNaN(formData.price) || formData.price <= 0) {
-        alert("Price must be a positive number!");
-        return;
-    }
-    if (isNaN(formData.available_seats) || formData.available_seats <= 0) {
-        alert("Available seats must be a positive number!");
-        return;
-    }
-
-    fetch("../api/bus_api.php", {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(formData)
-    })
-    .then(response => response.json())
-    .then(data => {
-        alert(data.message);
-        if (data.status === "success") {
-            closeEditModal();
-            loadBus();
+        if (isNaN(formData.available_seats) || formData.available_seats <= 0) {
+            alert("Available seats must be a positive number!");
+            return;
         }
-    })
-    .catch(error => {
-        console.error("Error:", error);
-        alert("Failed to update bus. Please try again.");
-    });
+
+        fetch("../api/bus_api.php", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            if (data.status === "success") {
+                closeEditModal();
+                loadBus();
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Failed to update bus. Please try again.");
+        });
+    } catch (err) {
+        console.error("Unexpected error in updateBus:", err);
+        alert("An unexpected error occurred. Check the console for details.");
+    }
 }
 
 function filterBus() {
@@ -249,32 +273,31 @@ function filterBus() {
             data.buses.forEach(bus => {
                 let row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${bus.bus_id}</td> <!-- Changed from bus.id to bus.bus_id -->
+                    <td>${bus.bus_id}</td>
                     <td>${bus.location}</td>
                     <td>${bus.destination}</td>
-                    <td>${bus.date}</td>
-                    <td>${bus.time}</td>
+                    <td>${bus.departure_time}</td>
+                    <td>${bus.arrival_time}</td>
+                    <td>${bus.available_seats}</td>
                     <td>${bus.bus_type}</td>
                     <td>${bus.price}</td>
-                    <td>${bus.available_seats}</td>
                     <td>${bus.bus_number}</td>
-                    <td>
-                        <button class="status-btn">Active</button>
-                    </td>
+                    <td>${bus.status}</td>
                 `;
                 
                 row.style.cursor = "pointer";
                 row.onclick = function() {
                     openUpdateModal(
-                        bus.bus_id, // Changed from bus.id to bus.bus_id
+                        bus.bus_id,
                         bus.location, 
                         bus.destination, 
-                        bus.date,
-                        bus.time, 
+                        bus.departure_time,
+                        bus.arrival_time, 
+                        bus.available_seats,
                         bus.bus_type, 
                         bus.price, 
-                        bus.available_seats,
-                        bus.bus_number
+                        bus.bus_number,
+                        bus.status
                     );
                 };
                 

@@ -2,48 +2,41 @@
 session_start();
 
 try {
-  $pdo = new PDO('mysql:host=localhost;dbname=signup', 'root', '');
+  $pdo = new PDO('mysql:host=localhost;dbname=hopstop', 'root', '');
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
   die("Connection failed: " . $e->getMessage());
 }
-
 if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['submit'])) {
-    $from = $_POST['from'];
-    $to = $_POST['to'];
+  $from = $_POST['from'];
+  $to = $_POST['to'];
 
-    if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['submit'])) {
-      $from = $_POST['from'];
-      $to = $_POST['to'];
-  
-      if (!empty($from) && !empty($to)) {
-          try {
-              $query = "SELECT DISTINCT * FROM bus WHERE location = :from AND destination = :to";
-              $stmt = $pdo->prepare($query);
-  
-              $stmt->bindValue(':from', $from, PDO::PARAM_STR);
-              $stmt->bindValue(':to', $to, PDO::PARAM_STR);
-  
-              $stmt->execute();
-              
-              $_SESSION['search_results'] = [];
-              if ($stmt->rowCount() > 0) {
-                  $_SESSION['search_results'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
-              } else {
-                  $_SESSION['search_results'] = "No tickets available for this route.";
-              }
-  
-              header("Location: User_account_booking.php");
-              exit();
-          } catch (PDOException $e) {
-              die("Database error: " . $e->getMessage());
+  if (!empty($from) && !empty($to)) {
+      try {
+          $query = "SELECT DISTINCT * FROM bus WHERE location = :from AND destination = :to";
+          $stmt = $pdo->prepare($query);
+          $stmt->bindValue(':from', $from, PDO::PARAM_STR);
+          $stmt->bindValue(':to', $to, PDO::PARAM_STR);
+          $stmt->execute();
+          
+          $_SESSION['search_results'] = [];
+          if ($stmt->rowCount() > 0) {
+              $_SESSION['search_results'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+          } else {
+              $_SESSION['search_results'] = "No tickets available for this route.";
           }
-      } else {
-          echo "<script>alert('Please fill in both fields'); window.history.back();</script>";
+
+          header("Location: User_account_booking.php");
           exit();
+      } catch (PDOException $e) {
+          die("Database error: " . $e->getMessage());
       }
+  } else {
+      echo "<script>alert('Please fill in both fields'); window.history.back();</script>";
+      exit();
   }
 }
+
 ?>
 
 
