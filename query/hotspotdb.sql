@@ -52,6 +52,7 @@ CREATE TABLE bookings (
   `booking_id` int(11) AUTO_INCREMENT PRIMARY KEY,
   `passenger_id` int(11),
   `bus_id` int(11),
+  'reserve_name' VARCHAR (100) NOT NULL,
   `passenger_type` enum('Regular','PWD/Senior Citizen','Student') NOT NULL,
   `seat_number` int(11) NOT NULL,
   `id_upload_path` varchar(255) DEFAULT NULL,

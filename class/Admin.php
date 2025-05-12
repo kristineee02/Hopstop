@@ -43,7 +43,6 @@ class Admin{
         $stmt->execute();
        
         if ($stmt->rowCount() == 0) {
-            // Default admin credentials
             $firstName = "Hop";
             $lastName = "Stop";
             $email = "admin@gmail.com";
@@ -67,7 +66,7 @@ class Admin{
                 return [
                     "message" => "Default admin created successfully",
                     "email" => $email,
-                    "password" => $password // Only return this during initial setup
+                    "password" => $password 
                 ];
             }
         }

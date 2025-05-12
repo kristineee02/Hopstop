@@ -108,7 +108,7 @@
                         <th>Type</th>
                         <th>Price</th>
                         <th>Available Seats</th>
-                        <th>Status</th>
+                        <th>Bus Number</th>
                     </tr>
                 </thead>
                 <tbody id="BusTableBody">
@@ -120,62 +120,56 @@
 
     <!-- Create Bus Modal -->
     <div id="createBusModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeCreateModal()">&times;</span>
-            <h3>Add Bus Details</h3>
-
-            <div class="form-grid">
-                <div class="form">
-                    <input type="number" id="busId" placeholder="Bus Id">
-                    <input type="text" id="status" placeholder="Bus status">
-                </div>
-                <div class="form-group">
-                    <select id="location-select">
-                        <option value="">Select Location</option>
-                        <option value="Zamboanga">Zamboanga</option>
-                        <option value="Pagadian">Pagadian</option>
-                        <option value="Dipolog">Dipolog</option>
-                        <option value="Cagayan">Cagayan</option>
-                    </select>
-
-                    <select id="destination-select">
-                        <option value="">Select Destination</option>
-                        <option value="Zamboanga">Zamboanga</option>
-                        <option value="Pagadian">Pagadian</option>
-                        <option value="Dipolog">Dipolog</option>
-                        <option value="Cagayan">Cagayan</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <input type="datetime-local" id="departureTime" placeholder="Departure Time">
-                    <input type="datetime-local" id="arrivalTime" placeholder="Arrival Time">
-                </div>
-
-                <div class="form-group">
-                    <select id="busType">
-                        <option value="">Select Bus Type</option>
-                        <option value="Air-Conditioned">Air-Conditioned</option>
-                        <option value="Non Air-Conditioned">Non Air-Conditioned</option>
-                    </select>
-
-                    <input type="number" id="price" placeholder="Price">
-                    <input type="number" id="availableSeats" placeholder="Available Seats">
-                </div>
+    <div class="modal-content">
+        <span class="close" onclick="closeCreateModal()">×</span>
+        <h3>Add Bus Details</h3>
+        <div class="form-grid">
+            <div class="form">
+                <input type="number" id="busNum" placeholder="Bus Number">
             </div>
-            <button class="save-btn" onclick="createNewBus()">Save Details</button>
+            <div class="form-group">
+                <select id="location-select">
+                    <option value="">Select Location</option>
+                    <option value="Zamboanga">Zamboanga</option>
+                    <option value="Pagadian">Pagadian</option>
+                    <option value="Dipolog">Dipolog</option>
+                    <option value="Cagayan">Cagayan</option>
+                </select>
+                <select id="destination-select">
+                    <option value="">Select Destination</option>
+                    <option value="Zamboanga">Zamboanga</option>
+                    <option value="Pagadian">Pagadian</option>
+                    <option value="Dipolog">Dipolog</option>
+                    <option value="Cagayan">Cagayan</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <input type="datetime-local" id="departureTime" placeholder="Departure Time">
+                <input type="datetime-local" id="arrivalTime" placeholder="Arrival Time">
+            </div>
+            <div class="form-group">
+                <select id="busType">
+                    <option value="">Select Bus Type</option>
+                    <option value="Air-Conditioned">Air-Conditioned</option>
+                    <option value="Non Air-Conditioned">Non Air-Conditioned</option>
+                </select>
+                <input type="number" id="price" placeholder="Price">
+                <input type="number" id="availableSeats" placeholder="Available Seats">
+            </div>
         </div>
+        <button class="save-btn" onclick="createNewBus()">Save Details</button>
     </div>
+</div>
 
     <!-- Edit Bus Modal -->
     <div id="editBusModal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeEditModal()">&times;</span>
-            <h3>Update Bus Details</h3>
+        <span class="close" onclick="closeEditModal()">×</span>            
+        <h3>Update Bus Details</h3>
             
             <div class="form">
-                    <input type="number" id="editBusId" placeholder="Bus Id" class="bus">
-                    <input type="text" id="editStatus" placeholder="Bus status" class="bus">
+                <input type="number" id="editBusId" placeholder="Bus Id" readonly>
+                <input type="number" id="editNumber" placeholder="Bus Number">
             </div>
 
             <div class="form-grid">

@@ -46,7 +46,6 @@ function login() {
 }
 
 function storeSession(data, userType) {
-    // Add the user type to session data
     const sessionData = {
         email: data.email,
         user_type: userType

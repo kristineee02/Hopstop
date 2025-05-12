@@ -82,20 +82,29 @@ class Bus {
     }
 
   
-    public function createNewBus($id, $location, $destination, $date, $time, $bus_type, $price, $available_seats, $bus_number) {
-        $query = "INSERT INTO Bus (bus_id, location, destination, date, time, bus_type, price, available_seats, bus_number)
-                  VALUES (:bus_id, :location, :destination, :date, :time, :bus_type, :price, :available_seats, :bus_number)";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':bus_number', $bus_number);
-        $stmt->bindParam(':bus_id', $id);
-        $stmt->bindParam(':location', $location);
-        $stmt->bindParam(':destination', $destination);
-        $stmt->bindParam(':time', $time);
-        $stmt->bindParam(':date', $date);
-        $stmt->bindParam(':bus_type', $bus_type);
-        $stmt->bindParam(':price', $price);
-        $stmt->bindParam(':available_seats', $available_seats);
-        return $stmt->execute();
+    public function createNewBus($location, $destination, $date, $time, $bus_type, $price, $available_seats, $bus_number) {
+        try {
+            // Parse datetime-local inputs
+            $date = date('Y-m-d', strtotime($date));
+            $time = date('H:i:s', strtotime($time));
+    
+            $query = "INSERT INTO " . $this->table . " (location, destination, date, time, bus_type, price, available_seats, bus_number)
+                      VALUES (:location, :destination, :date, :time, :bus_type, :price, :available_seats, :bus_number)";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':location', $location);
+            $stmt->bindParam(':destination', $destination);
+            $stmt->bindParam(':date', $date);
+            $stmt->bindParam(':time', $time);
+            $stmt->bindParam(':bus_type', $bus_type);
+            $stmt->bindParam(':price', $price);
+            $stmt->bindParam(':available_seats', $available_seats);
+            $stmt->bindParam(':bus_number', $bus_number);
+            
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log("Database error in createNewBus: " . $e->getMessage());
+            return false;
+        }
     }
   
     public function updateBus($id, $location, $destination, $date, $time, $bus_type, $price, $available_seats, $bus_number) {
@@ -128,13 +137,27 @@ class Bus {
    
     public function deleteBus($id) {
         try {
+            // Check if bus exists
+            $checkQuery = "SELECT COUNT(*) FROM " . $this->table . " WHERE bus_id = ?";
+            $checkStmt = $this->conn->prepare($checkQuery);
+            $checkStmt->bindParam(1, $id);
+            $checkStmt->execute();
+            $count = $checkStmt->fetchColumn();
+    
+            if ($count == 0) {
+                error_log("Delete failed: Bus with ID $id not found");
+                return false;
+            }
+    
             $query = "DELETE FROM " . $this->table . " WHERE bus_id = ?";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(1, $id);
             
-            return $stmt->execute();
+            $result = $stmt->execute();
+            error_log("Bus deletion for ID $id " . ($result ? "succeeded" : "failed"));
+            return $result;
         } catch (PDOException $e) {
-            error_log("Database error: " . $e->getMessage());
+            error_log("Database error in deleteBus: " . $e->getMessage());
             return false;
         }
     }
