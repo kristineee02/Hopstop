@@ -1,7 +1,7 @@
 <?php
 class Bus {
     private $conn;
-    private $table = 'Bus';
+    private $table = 'buses';
     public function __construct($db) {
         $this->conn = $db;
     }
@@ -28,7 +28,7 @@ class Bus {
     
     public function getBusById($id) {
         try {
-            $query = "SELECT * FROM " . $this->table . " WHERE id = ?";
+            $query = "SELECT * FROM " . $this->table . " WHERE bus_id = ?";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(1, $id);
             $stmt->execute();
@@ -82,40 +82,40 @@ class Bus {
     }
 
   
-    public function createNewBus($id, $location, $destination, $departure_time, $arrival_time, $bus_type, $price, $available_seats, $status) {
-        $query = "INSERT INTO Bus (id, location, destination, departure_time, arrival_time, bus_type, price, available_seats, status)
-                  VALUES (:id, :location, :destination, :departure_time, :arrival_time, :bus_type, :price, :available_seats, :status)";
+    public function createNewBus($id, $location, $destination, $date, $time, $bus_type, $price, $available_seats, $bus_number) {
+        $query = "INSERT INTO Bus (bus_id, location, destination, date, time, bus_type, price, available_seats, bus_number)
+                  VALUES (:bus_id, :location, :destination, :date, :time, :bus_type, :price, :available_seats, :bus_number)";
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':status', $status);
-        $stmt->bindParam(':id', $id);
+        $stmt->bindParam(':bus_number', $bus_number);
+        $stmt->bindParam(':bus_id', $id);
         $stmt->bindParam(':location', $location);
         $stmt->bindParam(':destination', $destination);
-        $stmt->bindParam(':departure_time', $departure_time);
-        $stmt->bindParam(':arrival_time', $arrival_time);
+        $stmt->bindParam(':time', $time);
+        $stmt->bindParam(':date', $date);
         $stmt->bindParam(':bus_type', $bus_type);
         $stmt->bindParam(':price', $price);
         $stmt->bindParam(':available_seats', $available_seats);
         return $stmt->execute();
     }
   
-    public function updateBus($id, $location, $destination, $departure_time, $arrival_time, $bus_type, $price, $available_seats, $status) {
+    public function updateBus($id, $location, $destination, $date, $time, $bus_type, $price, $available_seats, $bus_number) {
         try {
             $query = "UPDATE " . $this->table . " 
-                    SET location = ?, destination = ?, departure_time = ?, arrival_time = ?, 
-                        bus_type = ?, price = ?, available_seats = ?, status = ? 
-                    WHERE id = ?";
+                    SET location = ?, destination = ?, date = ?, time = ?, 
+                        bus_type = ?, price = ?, available_seats = ?, bus_number = ? 
+                    WHERE bus_id = ?";
             
             $stmt = $this->conn->prepare($query);
             
            
             $stmt->bindParam(1, $location);
             $stmt->bindParam(2, $destination);
-            $stmt->bindParam(3, $departure_time);
-            $stmt->bindParam(4, $arrival_time);
+            $stmt->bindParam(3, $date);
+            $stmt->bindParam(4, $time);
             $stmt->bindParam(5, $bus_type);
             $stmt->bindParam(6, $price);
             $stmt->bindParam(7, $available_seats);
-            $stmt->bindParam(8, $status);
+            $stmt->bindParam(8, $bus_number);
             $stmt->bindParam(9, $id);
             
             return $stmt->execute();
@@ -128,7 +128,7 @@ class Bus {
    
     public function deleteBus($id) {
         try {
-            $query = "DELETE FROM " . $this->table . " WHERE id = ?";
+            $query = "DELETE FROM " . $this->table . " WHERE bus_id = ?";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(1, $id);
             

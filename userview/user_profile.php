@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -7,8 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>HopStop Dashboard</title>
     <link rel="stylesheet" href="../style/user_prof.css">
-    <script src="../js/user script.js"></script>
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 
 <body>
@@ -45,21 +43,20 @@
                        <img src="../images/profile.png" alt="Profile Photo" id="profile-image">
                    </div>
                    <div class="details">
-                       <p><strong id="userName">User Name</strong></p>
-                       <p id="userEmail">user@example.com</p>
+                       <p><strong id="userName">Name</strong></p>
+                       <p id="userEmail">Email</p>
                    </div>
                </div>
                <div class="profile-actions">
                    <button class="edit-btn" id="EditProfile">Edit Profile</button>
                </div>
 
-
                <!-- EDIT PROFILE MODAL -->
                <div id="editProfileModal" class="modal">
                    <div class="modal-content">
                        <span class="close">&times;</span>
                        <h3>Update Profile</h3>
-                       <form id="profileUpdateForm" action="user_profile.php" method="POST" enctype="multipart/form-data">
+                       <form id="profileUpdateForm" enctype="multipart/form-data">
                            <div class="form-grid">
                                <div class="form-group">
                                    <label for="editfname">First Name</label>
@@ -96,7 +93,7 @@
                 </div>
             </section>
             <div class="booking-buttons">
-                <button class="cancel-btn"onclick="window.location.href='cancel.html';">Cancel Booking</button>
+                <button class="cancel-btn" onclick="window.location.href='cancel.html';">Cancel Booking</button>
                 <button class="view-btn">View Ticket</button>
             </div>
             <div class="booking-header">
@@ -128,6 +125,11 @@
                     <button class="view-btn1">View Ticket</button>
                 </div>
             </div>
+       </section>
+   </div>
+   
+   <!-- Add script tags at the end of the body -->
+   <script src="../js/user_script.js"></script>
 </body>
 
 </html>
