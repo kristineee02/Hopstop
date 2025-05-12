@@ -16,6 +16,7 @@ class User{
         return $stmt->execute([":firstName" => $firstName, ":lastName" => $lastName, ":email" => $email, ":password" => $hashed_password]);
     }
 
+    
     public function getPassenger(){
         $query = "SELECT * FROM " . $this->table;
         $stmt = $this->conn->prepare($query);
@@ -37,21 +38,26 @@ class User{
         $stmt->execute([":id" => $id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     } 
- 
 
-    public function login($email, $password){
+    public function user_login($email, $password) {
         $query = "SELECT * FROM " . $this->table . " WHERE email = :email";
         $stmt = $this->conn->prepare($query);
         $stmt->execute([":email" => $email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if($user && password_verify($password, $user["password"])){
-            return $user;
-        }else{
-            return false;
-
+        if ($user) {
+            if (password_verify($password, $user["password"])) {
+                return $user;
+            } else {
+                error_log("Password verification failed for email: $email");
+            }
+        } else {
+            error_log("No user found with email: $email");
         }
+
+        return false;
     }
+
 
     public function updateProfile($passengerId, $firstName, $lastName, $profilePic) {
         $query = "UPDATE " . $this->table . " SET first_name = :firstName, last_name = :lastName" . 

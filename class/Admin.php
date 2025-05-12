@@ -12,7 +12,6 @@ class Admin{
 
 
     public function addAdmin($firstName, $lastName, $email, $password){
-        // Hash the password before storing
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
        
         $query = "INSERT INTO " . $this->table . " (first_name, last_name, email, password) VALUES (:firstName, :lastName, :email, :password)";

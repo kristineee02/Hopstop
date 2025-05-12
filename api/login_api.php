@@ -35,7 +35,7 @@ switch ($method) {
                 echo json_encode(["status" => "success", "accountType" => "admin", "admins" => $adminData]);
             } 
             // If not admin, check if passenger
-            else if ($passengerData = $passenger->login($email, $password)) {
+            else if ($passengerData = $passenger->user_login($email, $password)) {
                 echo json_encode(["status" => "success", "accountType" => "passenger", "passengers" => $passengerData]);
             } 
             // Neither admin nor passenger - login failed

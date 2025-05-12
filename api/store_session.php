@@ -9,10 +9,7 @@ $postData = file_get_contents("php://input");
 $data = json_decode($postData, true);
 
 if (!empty($data)) {
-    // Store email
     $_SESSION['email'] = $data['email'];
-    
-    // Store user type
     $_SESSION['user_type'] = $data['user_type'];
     
     // Store ID based on user type

@@ -25,12 +25,6 @@ function addUser(){
         return;
     }
 
-    // Password validation (at least 8 characters)
-    if (formData.password.length < 8) {
-        alert("Password must be at least 8 characters long");
-        return;
-    }
-
     fetch("../api/user_signup_api.php", {
         method: "POST",
         body: JSON.stringify(formData),

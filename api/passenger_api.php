@@ -30,7 +30,7 @@ switch ($method) {
     case 'GET':
         if (isset($_GET["userId"])) {
             try {
-                $passenger = new User($db);
+                $passenger = new Passenger($db);
                 $passengerData = $passenger->getPassengerById($_GET["userId"]);
                 
                 if ($passengerData) {
@@ -75,8 +75,8 @@ switch ($method) {
                 exit;
             }
         
-            $passenger = new User($db);
-            $user = $passenger->login($data["email"], $data["password"]);
+            $passenger = new Passenger($db);
+            $user = $passenger->user_login($data["email"], $data["password"]);
         
             if ($user) {
                 $_SESSION["userEmail"] = $data["email"];
@@ -110,7 +110,7 @@ switch ($method) {
         }
         
         try {
-            $passenger = new User($db);
+            $passenger = new Passenger($db);
             $Id = $_SESSION["userId"];
             
             // For PUT requests with form data
