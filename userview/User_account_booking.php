@@ -1,8 +1,3 @@
-<?php
-session_start();
-$results = isset($_SESSION['search_results']) ? $_SESSION['search_results'] : null;
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -42,31 +37,18 @@ $results = isset($_SESSION['search_results']) ? $_SESSION['search_results'] : nu
     <img src="../images/Homepage_image1.png" alt="Bus Interior" class="header-image" />
   </div>
   <div class="search-box">
-    <h2>From → To travel location</h2>
+    <h2>Choose your travel location</h2>
   </div>
 
   <div class="user-container">
-    <div id="trips-container">
-      <?php
-      if ($results && is_array($results)) {
-          echo "<h2 class='trip'>Available Tickets:</h2>";
-          foreach ($results as $bus) {
-              echo "<div class='trip-card'>";
-              echo "<div class='trip-details'>";
-              echo "<p class='trip-id'>Bus: " . htmlspecialchars($bus['id']) . "</p>";
-              echo "<p class='trip-route'>Route: " . htmlspecialchars($bus['location']) . " → " . htmlspecialchars($bus['destination']) . "</p>";
-              echo "<p class='trip-time'>Departure: " . htmlspecialchars($bus['departure_time']) . "</p>";
-              echo "<p class='trip-time'>Arrival: " . htmlspecialchars($bus['arrival_time']) . "</p>";
-              echo "<p class='trip-price'>Price: PHP" . htmlspecialchars($bus['price']) . "</p>";
-              echo "</div>";
-              echo '<button class="book-button" onclick="window.location.href=\'User_account_book_details.php?id=' . htmlspecialchars($bus['id']) . '\';">Book now</button>';
-              echo "</div>";
-          }
-      } else {
-          echo "<p>No tickets available for this route.</p>";
-      }
-      ?>
+          <h2 class="trip">Available Tickets:</h2>
+          <div id="trips-container"></div>
+                <!-- <div class="trip-card">
+            
+        </div> -->
     </div>
   </div>
+
+  <script src="../js/user_account_booking.js"></script>
 </body>
 </html>

@@ -8,17 +8,10 @@ class Bus {
     }
 
     public function getAllBusDetails() {
-        try {
-            $query = "SELECT bus_id, bus_number, location, destination, bus_type, 
-                            departure_time, arrival_time, available_seats, price, status 
-                      FROM " . $this->table;
-            $stmt = $this->conn->prepare($query);
-            $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            error_log("Database error in getAllBusDetails: " . $e->getMessage());
-            throw new Exception("Failed to fetch buses: " . $e->getMessage());
-        }
+        $query = "SELECT * FROM bus";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function getBusById($id) {

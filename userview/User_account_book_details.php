@@ -1,31 +1,3 @@
-<?php
-session_start();
-include '../api/database.php';
-include '../class/Bus.php';
-
-// Get bus details from URL parameter
-$bus_id = isset($_GET['id']) ? $_GET['id'] : null;
-$bus_details = null;
-
-if ($bus_id) {
-    try {
-        $database = new Database();
-        $db = $database->getConnection();
-        
-        $query = "SELECT DISTINCT * FROM Bus WHERE id = :id";
-        $stmt = $db->prepare($query);
-        $stmt->bindValue(':id', $bus_id, PDO::PARAM_STR);
-        $stmt->execute();
-        
-        if ($stmt->rowCount() > 0) {
-            $bus_details = $stmt->fetch(PDO::FETCH_ASSOC);
-        }
-    } catch (PDOException $e) {
-        die("Database error: " . $e->getMessage());
-    }
-}
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -72,45 +44,40 @@ if ($bus_id) {
         </div>
 
         <div class="bus-details" id="bus">
-            <?php if ($bus_details): ?>
                 <div class="detail-row">
                     <div class="detail-label">BUS ID:</div>
-                    <div class="detail-value"><?php echo htmlspecialchars($bus_details['id']); ?></div>
+                    <div class="detail-value" id="busDisplay"></div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">From:</div>
-                    <div class="detail-value"><?php echo htmlspecialchars($bus_details['location']); ?></div>
+                    <div class="detail-value" id="fromDisplay"></div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">To:</div>
-                    <div class="detail-value"><?php echo htmlspecialchars($bus_details['destination']); ?></div>
+                    <div class="detail-value" id="toDisplay"></div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Departure:</div>
-                    <div class="detail-value"><?php echo htmlspecialchars($bus_details['departure_time']); ?></div>
+                    <div class="detail-value" id="departureDisplay"></div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Arrival:</div>
-                    <div class="detail-value"><?php echo htmlspecialchars($bus_details['arrival_time']); ?></div>
+                    <div class="detail-value" id="arrivalDisplay"></div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Bus Type:</div>
-                    <div class="detail-value"><?php echo htmlspecialchars($bus_details['bus_type']); ?></div>
+                    <div class="detail-value" id="typeDisplay"></div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Price:</div>
-                    <div class="detail-value">PHP <?php echo htmlspecialchars($bus_details['price']); ?></div>
+                    <div class="detail-value" id="priceDisplay"></div>
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Available Seats:</div>
-                    <div class="detail-value"><?php echo isset($bus_details['available_seats']) ? htmlspecialchars($bus_details['available_seats']) : 'N/A'; ?></div>
+                    <div class="detail-value" id="seatsDisplay"></div>
                 </div>
 
-                <button class="book-button" onclick="redirectToTicketForm(<?php echo $bus_details['id']; ?>)">Book now</button>
-            <?php else: ?>
-                <div class="no-details">No bus details available. Please select a bus from the booking page.</div>
-                <a href="User_account_booking.php" class="back-button">Go back to search</a>
-            <?php endif; ?>
+                <button class="book-button" >Book now</button>
         </div>
     </div>
 
@@ -170,9 +137,8 @@ if ($bus_id) {
             });
         });
 
-        function redirectToTicketForm(bus_id) {
-            window.location.href = "User_account_ticket_form.php?bus_id=" + bus_id;
-        }
     </script>
+        <script src="../js/book_details.js"></script>
+
 </body>
 </html>

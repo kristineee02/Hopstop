@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         alert(`Create an account or log in to search for tickets.`);
-        window.location.href = "../signup/SignUp.php"; 
+        window.location.href = "../signup/SignupAs.php"; 
     });
     
     const scrollbtn = document.getElementById('scroll-down');
@@ -32,5 +32,5 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function login() {
-        window.location.href = "../Login/LogIn.php"; 
+        window.location.href = "../Login/UserLogin.php"; 
 }

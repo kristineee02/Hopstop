@@ -1,5 +1,5 @@
 <?php
-class User{
+class Passenger{
     private $conn;
     private $table = "passenger";
 
@@ -8,17 +8,34 @@ class User{
         $this->conn = $db;
     }
 
-    public function addUser($firstName, $lastName, $email, $password){
-        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-        
+    public function addUser($firstName, $lastName, $email, $password) {
+        // Check for existing email
+        $query = "SELECT COUNT(*) FROM " . $this->table . " WHERE email = :email";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute([":email" => $email]);
+        if ($stmt->fetchColumn() > 0) {
+            throw new Exception("Email already exists");
+        }
+
+        $hashed_password = password_hash($password, PASSWORD_BCRYPT);
         $query = "INSERT INTO " . $this->table . " (first_name, last_name, email, password) VALUES (:firstName, :lastName, :email, :password)";
         $stmt = $this->conn->prepare($query);
-        return $stmt->execute([":firstName" => $firstName, ":lastName" => $lastName, ":email" => $email, ":password" => $hashed_password]);
+        $params = [
+            ":firstName" => $firstName,
+            ":lastName" => $lastName,
+            ":email" => $email,
+            ":password" => $hashed_password
+        ];
+
+        if ($stmt->execute($params)) {
+            return true;
+        }
+        return false;
     }
 
     
     public function getPassenger(){
-        $query = "SELECT * FROM " . $this->table;
+        $query = "SELECT * FROM " . $this->table . "WHERE passenger_id = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -45,19 +62,11 @@ class User{
         $stmt->execute([":email" => $email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($user) {
-            if (password_verify($password, $user["password"])) {
-                return $user;
-            } else {
-                error_log("Password verification failed for email: $email");
-            }
-        } else {
-            error_log("No user found with email: $email");
+        if ($user && password_verify($password, $user["password"])) {
+            return $user;
         }
-
         return false;
     }
-
 
     public function updateProfile($passengerId, $firstName, $lastName, $profilePic) {
         $query = "UPDATE " . $this->table . " SET first_name = :firstName, last_name = :lastName" . 

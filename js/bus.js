@@ -1,7 +1,6 @@
 document.addEventListener("DOMContentLoaded", function() {
     loadBus();
     
-    // Set up modal close buttons
     const closeButtons = document.querySelectorAll(".close");
     closeButtons.forEach(button => {
         button.addEventListener("click", function() {

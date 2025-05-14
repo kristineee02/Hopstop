@@ -1,165 +1,46 @@
 <?php
 header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: POST, GET, PUT");
+header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type");
 
-// Check for preflight OPTIONS request
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit;
-}
+include "database.php";
+include "../class/Passenger.php";
 
-session_start();
-require_once '../api/database.php';
-require_once '../class/Passenger.php';
+$database = new Database();
+$db = $database->getConnection();
 
-try {
-    $db = $database->connect();
-} catch (Exception $e) {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Database connection error: " . $e->getMessage()
-    ]);
-    exit;
-}
+$passenger = new Passenger($db);
 
 $method = $_SERVER["REQUEST_METHOD"];
 
-switch ($method) {
-    case 'GET':
-        if (isset($_GET["userId"])) {
-            try {
-                $passenger = new Passenger($db);
-                $passengerData = $passenger->getPassengerById($_GET["userId"]);
-                
-                if ($passengerData) {
-                    echo json_encode([
-                        "status" => "success",
-                        "passengerData" => $passengerData
-                    ]);
-                } else {
-                    echo json_encode([
-                        "status" => "error",
-                        "message" => "Passenger not found"
-                    ]);
-                }
-            } catch (Exception $e) {
-                echo json_encode([
-                    "status" => "error",
-                    "message" => "Server error: " . $e->getMessage()
-                ]);
-            }
-        } else if (isset($_SESSION["userId"])) {
-            // Return current session user ID
-            echo json_encode([
-                "status" => "success",
-                "message" => "Session data retrieved",
-                "userId" => $_SESSION["userId"]
-            ]);
-        } else {
-            echo json_encode([
-                "status" => "error",
-                "message" => "No active session"
-            ]);
-        }
-        break;
-        
-    case 'POST':
-        try {
-            $postData = file_get_contents("php://input");
-            $data = json_decode($postData, true);
-        
-            if (!isset($data["email"]) || !isset($data["password"])) {
-                echo json_encode(["status" => "error", "message" => "Missing email or password"]);
-                exit;
-            }
-        
-            $passenger = new Passenger($db);
-            $user = $passenger->user_login($data["email"], $data["password"]);
-        
-            if ($user) {
-                $_SESSION["userEmail"] = $data["email"];
-                $_SESSION["userId"] = $user["passenger_id"];
-                echo json_encode([
-                    "status" => "success",
-                    "message" => "Login successful",
-                    "userId" => $user["passenger_id"]
-                ]);
-            } else {
-                echo json_encode([
-                    "status" => "error",
-                    "message" => "Invalid email or password"
-                ]);
-            }
-        } catch (Exception $e) {
-            echo json_encode([
-                "status" => "error",
-                "message" => "Server error: " . $e->getMessage()
-            ]);
-        }
-        break;
-        
-    case 'PUT':
-        if (!isset($_SESSION["userId"])) {
-            echo json_encode([
-                "status" => "error",
-                "message" => "Not authenticated"
-            ]);
-            exit;
-        }
-        
-        try {
-            $passenger = new Passenger($db);
-            $Id = $_SESSION["userId"];
-            
-            // For PUT requests with form data
-            $firstName = $_POST["firstName"] ?? "";
-            $lastName = $_POST["lastName"] ?? "";
-            $pictureFileName = null;
-            
-            if (isset($_FILES["picture"]) && $_FILES["picture"]["error"] == 0) {
-                $uploadDir = "../Uploads/";
-                if (!file_exists($uploadDir)) {
-                    mkdir($uploadDir, 0777, true);
-                }
-                
-                $pictureFileName = time() . "_" . basename($_FILES["picture"]["name"]);
-                $targetFile = $uploadDir . $pictureFileName;
-                
-                if (!move_uploaded_file($_FILES["picture"]["tmp_name"], $targetFile)) {
-                    throw new Exception("Failed to upload profile picture");
-                }
-            }
-            
-            $result = $passenger->updateProfile(
-                $Id,
-                $firstName,
-                $lastName,
-                $pictureFileName
-            );
-            
-            if ($result) {
-                echo json_encode([
-                    "status" => "success",
-                    "message" => "Profile updated successfully"
-                ]);
-            } else {
-                throw new Exception("Failed to update profile");
-            }
-        } catch (Exception $e) {
-            error_log("Profile update error: " . $e->getMessage());
-            echo json_encode([
-                "status" => "error",
-                "message" => "Server error: " . $e->getMessage()
-            ]);
-        }
-        break;
-        
-    default:
-        echo json_encode([
-            "status" => "error",
-            "message" => "Invalid request method"
-        ]);
+if ($method !== "POST") {
+    http_response_code(405);
+    echo json_encode(["status" => "error", "message" => "Method not allowed"]);
+    exit;
+}
+
+$postData = file_get_contents("php://input");
+$data = json_decode($postData, true);
+
+if (empty($data["firstName"]) || empty($data["lastName"]) || empty($data["email"]) || empty($data["password"])) {
+    http_response_code(400);
+    echo json_encode(["status" => "error", "message" => "All fields are required"]);
+    exit;
+}
+
+
+try {
+    $result = $passenger->addUser($data["firstName"], $data["lastName"], $data["email"], $data["password"]);
+    if ($result) {
+        http_response_code(201);
+        echo json_encode(["status" => "success", "message" => "User created successfully"]);
+    } else {
+        http_response_code(500);
+        echo json_encode(["status" => "error", "message" => "Failed to create user"]);
+    }
+} catch (Exception $e) {
+    http_response_code(400);
+    echo json_encode(["status" => "error", "message" => $e->getMessage()]);
 }
 ?>

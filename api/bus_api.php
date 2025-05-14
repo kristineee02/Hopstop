@@ -31,6 +31,35 @@ if ($method === 'POST' || $method === 'PUT') {
 
 switch ($method) {
     case 'GET':
+        if (isset($_GET['action']) && $_GET['action'] === 'search') {
+            // Search endpoint for location and destination
+            if (!isset($_GET['location']) || !isset($_GET['destination'])) {
+                echo json_encode(["status" => "error", "message" => "Location and destination are required"]);
+                exit;
+            }
+
+            $location = $_GET['location'];
+            $destination = $_GET['destination'];
+
+            try {
+                $query = "SELECT DISTINCT * FROM bus WHERE location = :location AND destination = :destination";
+                $stmt = $db->prepare($query);
+                $stmt->bindValue(':location', $location, PDO::PARAM_STR);
+                $stmt->bindValue(':destination', $destination, PDO::PARAM_STR);
+                $stmt->execute();
+
+                $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                if ($results) {
+                    echo json_encode(["status" => "success", "buses" => $results]);
+                } else {
+                    echo json_encode(["status" => "success", "message" => "No tickets available for this route", "buses" => []]);
+                }
+            } catch (PDOException $e) {
+                echo json_encode(["status" => "error", "message" => "Database error: " . $e->getMessage()]);
+            }
+            exit;
+        }
+
         $filters = [];
         if (isset($_GET['location'])) $filters['location'] = $_GET['location'];
         if (isset($_GET['destination'])) $filters['destination'] = $_GET['destination'];
