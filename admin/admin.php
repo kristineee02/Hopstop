@@ -100,7 +100,7 @@
         <div class="logo">Admin HopStop</div>
         <nav class="nav-menu">
             <a href="admin.php">Bus Management</a>
-            <a href="#">Booking Management</a>
+            <a href="booking_management.php">Booking Management</a>
             <a href="passenger_list.php">Passenger Records</a>
             <a href="#">Logout</a>
         </nav>
