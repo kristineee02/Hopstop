@@ -128,7 +128,7 @@
             <div class="dropdown-item">Logout</div>
         </div>
         </div>
-      <script src="User_account.js"></script>
+      <script src="../js/user_script.js"></script>
     </header>
     
     <section class="banner">

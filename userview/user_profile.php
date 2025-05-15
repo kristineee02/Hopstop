@@ -40,34 +40,31 @@
            <section class="profile-card" id="profileHeaderDocumet">
                <div class="profile-info">
                    <div class="avatar">
-                       <img src="../images/profile.png" alt="Profile Photo" id="profile-image">
+                       <img src="../images/profile.png" alt="Profile Photo" id="imageDisplay2">
                    </div>
                    <div class="details">
-                       <p><strong id="userName">Name</strong></p>
+                       <p><strong id="nameDisplay2">Name</strong></p>
                        <p id="userEmail">Email</p>
                    </div>
                </div>
                <div class="profile-actions">
                    <button class="edit-btn" id="EditProfile">Edit Profile</button>
                </div>
-
                <!-- EDIT PROFILE MODAL -->
                <div id="editProfileModal" class="modal">
                    <div class="modal-content">
-                       <span class="close">&times;</span>
+                       <span class="close">×</span>
                        <h3>Update Profile</h3>
                        <form id="profileUpdateForm" enctype="multipart/form-data">
                            <div class="form-grid">
                                <div class="form-group">
-                                   <label for="editfname">First Name</label>
-                                   <input type="text" id="editfname" name="editfname" placeholder="First Name" required>
-                                  
-                                   <label for="editlname">Last Name</label>
-                                   <input type="text" id="editlname" name="editlname" placeholder="Last Name" required>
-                                  
+                                   <label for="editfirstName">First Name</label>
+                                   <input type="text" id="editfirstName" name="firstName" placeholder="First Name" required>
+                                   <label for="editlastName">Last Name</label>
+                                   <input type="text" id="editlastName" name="lastName" placeholder="Last Name" required>
                                    <div class="file-input">
-                                       <label for="editProfile">Profile Picture</label>
-                                       <input type="file" id="editProfile" name="editProfile" accept="image/*">
+                                       <label for="edit-prof">Profile Picture</label>
+                                       <input type="file" id="edit-prof" name="picture" accept="image/*">
                                    </div>                
                                </div>
                            </div>
@@ -76,7 +73,7 @@
                    </div>
                </div>
            </section>
-
+           
             <h2>Active Booking</h2>
             <section class="booking-section">
                 <div class="booking-scroll">
@@ -93,7 +90,7 @@
                 </div>
             </section>
             <div class="booking-buttons">
-                <button class="cancel-btn" onclick="window.location.href='cancel.html';">Cancel Booking</button>
+                <button class="cancel-btn" onclick="window.location.href='cancel.php';">Cancel Booking</button>
                 <button class="view-btn">View Ticket</button>
             </div>
             <div class="booking-header">

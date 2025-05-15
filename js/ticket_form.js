@@ -2,6 +2,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Set up profile dropdown toggle
     const profileButton = document.getElementById('profileButton');
     const profileDropdown = document.getElementById('profileDropdown');
+
+    //SEAT SELECTIO MODAL 
+    const seatModal = document.getElementById('seat-modal');
+    const closeSeatModal = document.getElementById('close-seat-modal');
+    const selectSeatBtn = document.getElementById('select-seat-btn');
+    const seatNumberInput = document.getElementById('seat-number');
+    const ticketForm = document.getElementById('ticket-form');
     
     if (profileButton && profileDropdown) {
         profileButton.addEventListener('click', function() {
@@ -121,7 +128,7 @@ function displayBusDetails(buses) {
     busDetails.innerHTML = `
         <h3>Trip Information</h3>
         <div class="form-group">
-            <label>Bus ID: <span class="auto-generated" id="busId">${bus.bus_id || bus.bus_number}</span></label>
+            <label>Bus Number: <span class="auto-generated" id="busId">${bus.bus_number}</span></label>
         </div>
         <div class="form-group">
             <label>From: <span class="auto-generated">${bus.location || 'N/A'}</span></label>
@@ -275,6 +282,62 @@ function processBooking() {
 function cancelBooking() {
     if (confirm('Are you sure you want to cancel this booking?')) {
         window.location.href = 'User.php';
+    }
+}
+
+// Function to fetch and display available seats
+async function getAllSBusDetails(busId) {
+    if (selectSeatBtn) {
+        selectSeatBtn.addEventListener('click', function() {
+            fetchBusDetails(busId);
+        });
+    }
+    
+    // Close modal when close button is clicked
+    if (closeSeatModal) {
+        closeSeatModal.addEventListener('click', function() {
+            seatModal.style.display = 'none';
+        });
+    }
+    try {
+        const response = await fetch(`../api/booking_api.php?bus_id=${busId}`);
+        const data = await response.json();
+
+        if (data.success && data.available_seats) {
+            const seatMap = document.getElementById('seat-map');
+            if (seatMap) {
+                seatMap.innerHTML = '';
+
+                if (data.available_seats.length === 0) {
+                    seatMap.textContent = "No seats available.";
+                } else {
+                    data.available_seats.forEach(seat => {
+                        const seatBtn = document.createElement('button');
+                        seatBtn.type = 'button';
+                        seatBtn.textContent = seat;
+                        seatBtn.classList.add('seat-button');
+                        seatBtn.addEventListener('click', () => {
+                            if (seatNumberInput) {
+                                seatNumberInput.value = seat;
+                            }
+                            if (seatModal) {
+                                seatModal.style.display = 'none';
+                            }
+                        });
+                        seatMap.appendChild(seatBtn);
+                    });
+                }
+            }
+            
+            if (seatModal) {
+                seatModal.style.display = 'flex';
+            }
+        } else {
+            alert(data.message || 'Error fetching seats');
+        }
+    } catch (err) {
+        console.error(err);
+        alert('Failed to fetch seat data.');
     }
 }
 

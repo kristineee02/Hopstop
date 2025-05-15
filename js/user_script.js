@@ -12,30 +12,23 @@ function toggleDropdown1() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-   
     const profileButton = document.getElementById('profileButton');
     const profileDropdown = document.getElementById('profileDropdown');
-  
-    profileButton.addEventListener('click', function() {
-        profileDropdown.classList.toggle('show');
-    });
-  
-    // Close dropdown when clicking outside
-    window.addEventListener('click', function(event) {
-        if (!event.target.matches('.user-profile') && !event.target.matches('.fa-user-circle')) {
-            if (profileDropdown.classList.contains('show')) {
+    if (profileButton && profileDropdown) {
+        profileButton.addEventListener('click', function(event) {
+            event.stopPropagation();
+            profileDropdown.classList.toggle('show');
+        });
+        window.addEventListener('click', function(event) {
+            if (!profileButton.contains(event.target) && !profileDropdown.contains(event.target)) {
                 profileDropdown.classList.remove('show');
             }
-        }
-    });
-    
-    // Initialize modal functionality
+        });
+    }
+
     initModal();
-     
-    // Load user data on page load
     getPassenger();
-     
-    // Handle form submission
+
     const profileForm = document.getElementById("profileUpdateForm");
     if (profileForm) {
         profileForm.addEventListener("submit", function(event) {
@@ -44,137 +37,105 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
-  
+
 function initModal() {
-    const modal = document.getElementById("editProfileModal");
-    const editProfileBtn = document.getElementById("EditProfile");
-    
-    if (!modal || !editProfileBtn) {
-        console.error("Modal elements not found");
-        return;
-    }
-    
-    const closeBtn = modal.querySelector(".close");
-     
-    editProfileBtn.addEventListener("click", function() {
-        modal.classList.add("show");
+    document.addEventListener('click', function(e) {
+        if (e.target && e.target.id === 'EditProfile') {
+            e.preventDefault();
+            document.getElementById("editProfileModal").classList.add("show");
+        }
+        if (e.target && e.target.classList.contains('close')) {
+            document.getElementById("editProfileModal").classList.remove("show");
+        }
     });
-     
-    closeBtn.addEventListener("click", function() {
-        modal.classList.remove("show");
-    });
-     
-    window.addEventListener("click", function(event) {
-        if (event.target === modal) {
+
+    window.addEventListener('click', function(e) {
+        const modal = document.getElementById("editProfileModal");
+        if (e.target === modal) {
             modal.classList.remove("show");
         }
     });
 }
 
 function getPassenger() {
-    fetch("../api/passenger_api.php")
-    .then(response => {
-        if (!response.ok) {
-            throw new Error("Network response was not ok");
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log("Session data:", data);
-        if (data.status === "success" && data.userId) {
-            const passengerId = data.userId;
-            return fetch(`../api/passenger_api.php?userId=${passengerId}`);
-        } else {
-            throw new Error("No active user session found");
-        }
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error("Network response was not ok");
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log("User data:", data);
-        if (data.status === "success" && data.passengerData) {
-            const userNameElement = document.getElementById("userName");
-            const userEmailElement = document.getElementById("userEmail");
-            const profileImageElement = document.getElementById("profile-image");
-            
-            if (userNameElement) {
-                userNameElement.textContent = 
-                    `${data.passengerData.first_name} ${data.passengerData.last_name}`;
+    fetch("../api/store_session.php")
+        .then(response => {
+            if (!response.ok) throw new Error('Session fetch failed');
+            return response.json();
+        })
+        .then(data => {
+            console.log('Session response:', data);
+            if (data.status === "success" && data.userId) {
+                return fetch(`../api/passenger_api.php?userId=${data.userId}`);
+            } else {
+                throw new Error("User not authenticated");
             }
-            
-            if (userEmailElement) {
-                userEmailElement.textContent = data.passengerData.email;
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Passenger fetch failed');
+            return response.json();
+        })
+        .then(data => {
+            console.log('Passenger response:', data);
+            if (data.status === "success" && data.passengerData) {
+                const passenger = data.passengerData;
+                document.getElementById("imageDisplay2").src = passenger.picture ? `../Uploads/${passenger.picture}` : '../images/profile.png';
+                document.getElementById("nameDisplay2").textContent = `${passenger.first_name} ${passenger.last_name}`;
+                document.getElementById("userEmail").textContent = passenger.email;
+                document.getElementById("editfirstName").value = passenger.first_name;
+                document.getElementById("editlastName").value = passenger.last_name;
+                document.getElementById("edit-prof").setAttribute('data-current', passenger.picture || '');
+            } else {
+                throw new Error(data.message || "Failed to load passenger data");
             }
-            
-            if (profileImageElement && data.passengerData.picture) {
-                profileImageElement.src = `../Uploads/${data.passengerData.picture}`;
-            }
-            
-            // Also update form fields for editing
-            const firstNameInput = document.getElementById("editfname");
-            const lastNameInput = document.getElementById("editlname");
-            
-            if (firstNameInput) {
-                firstNameInput.value = data.passengerData.first_name;
-            }
-            
-            if (lastNameInput) {
-                lastNameInput.value = data.passengerData.last_name;
-            }
-        } else {
-            console.error("Failed to get user data:", data.message);
-        }
-    })
-    .catch(error => {
-        console.error("Error in user data fetching:", error);
-        // Optionally redirect to login page if session is invalid
-        // window.location.href = "login.php";
-    });
+        })
+        .catch(error => {
+            console.error('Error fetching passenger:', error);
+            alert("Error loading profile: " + error.message);
+        });
 }
 
 function updateProfile() {
     const formData = new FormData();
-    const firstNameInput = document.getElementById("editfname");
-    const lastNameInput = document.getElementById("editlname");
-    const profilePicInput = document.getElementById("editProfile");
-    
-    if (firstNameInput) {
-        formData.append('firstName', firstNameInput.value);
-    }
-    
-    if (lastNameInput) {
-        formData.append('lastName', lastNameInput.value);
-    }
-
-    if (profilePicInput && profilePicInput.files && profilePicInput.files[0]) {
+    formData.append('firstName', document.getElementById("editfirstName").value);
+    formData.append('lastName', document.getElementById("editlastName").value);
+    const profilePicInput = document.getElementById("edit-prof");
+    if (profilePicInput.files[0]) {
         formData.append('picture', profilePicInput.files[0]);
     }
 
-    fetch("../api/passenger_api.php", {
-        method: "PUT",
-        body: formData
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error("Network response was not ok");
-        }
-        return response.json();
-    })
-    .then(data => {
-        if (data.status === "success") {
-            alert("Profile updated successfully!");
-            // Reload the page to show updated information
-            window.location.reload();
-        } else {
-            throw new Error(data.message || "Update failed");
-        }
-    })
-    .catch(error => {
-        console.error("Update error:", error);
-        alert("Error updating profile: " + error.message);
-    });
+    fetch("../api/store_session.php")
+        .then(response => {
+            if (!response.ok) throw new Error('Session fetch failed');
+            return response.json();
+        })
+        .then(data => {
+            console.log('Session response for update:', data);
+            if (data.status === "success" && data.userId) {
+                formData.append('passengerId', data.userId);
+                return fetch("../api/passenger_api.php", {
+                    method: "POST",
+                    body: formData
+                });
+            } else {
+                throw new Error("User not authenticated");
+            }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Update failed');
+            return response.json();
+        })
+        .then(data => {
+            console.log('Update response:', data);
+            if (data.status === "success") {
+                alert("Profile updated successfully!");
+                window.location.reload();
+            } else {
+                throw new Error(data.message || "Update failed");
+            }
+        })
+        .catch(error => {
+            console.error('Error updating profile:', error);
+            alert("Error updating profile: " + error.message);
+        });
 }

@@ -1,12 +1,13 @@
 <?php
 header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: POST");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE");
 header("Access-Control-Allow-Headers: Content-Type");
 
 include "database.php";
-include "../class/Passenger.php";
+include "../class/Freelancer.php";
 
+session_start();
 $database = new Database();
 $db = $database->getConnection();
 
@@ -14,33 +15,56 @@ $passenger = new Passenger($db);
 
 $method = $_SERVER["REQUEST_METHOD"];
 
-if ($method !== "POST") {
-    http_response_code(405);
-    echo json_encode(["status" => "error", "message" => "Method not allowed"]);
-    exit;
-}
+switch ($method) {
+    case 'GET':
+        if (isset($_GET["userId"])) {
+            $passengerData = $passenger->getPassengerById($_GET["userId"]);
+            echo json_encode(["status" => "success", "passengerData" => $passengerData]);
+        } else {
+            $passengers = $passenger->getPassenger();
+            echo json_encode(["status" => "success", "passengers" => $passengers]);
+        }
+        break;
 
-$postData = file_get_contents("php://input");
-$data = json_decode($postData, true);
+    case 'POST':
+        if (!isset($_SESSION['userId'])) {
+            echo json_encode(["status" => "error", "message" => "User not authenticated"]);
+            exit;
+        }
 
-if (empty($data["firstName"]) || empty($data["lastName"]) || empty($data["email"]) || empty($data["password"])) {
-    http_response_code(400);
-    echo json_encode(["status" => "error", "message" => "All fields are required"]);
-    exit;
-}
+        if (isset($_POST['firstName'], $_POST['lastName'], $_POST['email'])) {
+            $userId = $_SESSION['userId'];
+            $firstName = $_POST['firstName'];
+            $lastName = $_POST['lastName'];
+            $address = $_POST['email'];
+            $profilePic = null;
 
+            if (isset($_FILES['picture']) && $_FILES['picture']['error'] === UPLOAD_ERR_OK) {
+                $uploadDir = '../Uploads/';
+                $fileName = uniqid() . '-' . basename($_FILES['picture']['name']);
+                $uploadPath = $uploadDir . $fileName;
 
-try {
-    $result = $passenger->addUser($data["firstName"], $data["lastName"], $data["email"], $data["password"]);
-    if ($result) {
-        http_response_code(201);
-        echo json_encode(["status" => "success", "message" => "User created successfully"]);
-    } else {
-        http_response_code(500);
-        echo json_encode(["status" => "error", "message" => "Failed to create user"]);
-    }
-} catch (Exception $e) {
-    http_response_code(400);
-    echo json_encode(["status" => "error", "message" => $e->getMessage()]);
+                if (move_uploaded_file($_FILES['picture']['tmp_name'], $uploadPath)) {
+                    $profilePic = $fileName;
+                } else {
+                    echo json_encode(["status" => "error", "message" => "Failed to upload profile picture"]);
+                    exit;
+                }
+            }
+
+            try {
+                $passenger->updateProfile($userId, $firstName, $lastName, $picture);
+                echo json_encode(["status" => "success", "message" => "Profile updated successfully"]);
+            } catch (Exception $e) {
+                echo json_encode(["status" => "error", "message" => "Update failed: " . $e->getMessage()]);
+            }
+        } else {
+            echo json_encode(["status" => "error", "message" => "Missing required fields"]);
+        }
+        break;
+
+    default:
+        echo json_encode(["status" => "error", "message" => "Invalid request method"]);
+        break;
 }
 ?>
