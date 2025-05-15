@@ -39,7 +39,6 @@ CREATE TABLE `bookings` (
   `passenger_type` enum('Regular','PWD/Senior Citizen','Student') NOT NULL,
   `seat_number` int(11) NOT NULL,
   `id_upload_path` varchar(255) DEFAULT NULL,
-  `remarks` text NOT NULL,
   `reference` varchar(50) NOT NULL,
   `status` enum('pending','confirmed','cancelled') NOT NULL DEFAULT 'pending',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),

@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="../style/User_account_ticket_form.css">
     <script src="../js/Userlogout.js"></script>
     <title>HopStop - Ticket Form</title>
+
 </head>
 <body>
 <div id="main-container">
@@ -50,73 +51,102 @@
         </div>
 
         <!-- Ticket Form -->
-        <div class="ticket-form">
-            <div class="form-group">
-                <label for="name">Name:</label>
-                <input type="text" id="name" name="name">
-            </div>
+<div class="ticket-form">
+    <!-- Primary Passenger Details -->
+    <div class="passenger-section">
+        <h3>Passenger Details</h3>
+        <div class="form-group">
+            <label for="name">Full Name:</label>
+            <input type="text" id="name" name="name" placeholder="Enter full name" required>
+        </div>
 
-            <div class="form-group">
-                <label>Passenger Type:</label>
-                <div class="radio-group">
-                    <div class="radio-option">
-                        <input type="radio" id="regular" name="passengerType" value="regular" checked>
-                        <label for="regular">Regular</label>
-                    </div>
-                    <div class="radio-option">
-                        <input type="radio" id="pwd" name="passengerType" value="pwd">
-                        <label for="pwd">PWD/Senior</label>
-                    </div>
-                    <div class="radio-option">
-                        <input type="radio" id="student" name="passengerType" value="student">
-                        <label for="student">Student</label>
-                    </div>
+        <div class="form-group">
+            <label>Passenger Type:</label>
+            <div class="radio-group">
+                <div class="radio-option">
+                    <input type="radio" id="regular" name="passengerType" value="regular">
+                    <label for="regular">Regular</label>
+                </div>
+                <div class="radio-option">
+                    <input type="radio" id="pwd" name="passengerType" value="pwd">
+                    <label for="pwd">PWD/Senior</label>
+                </div>
+                <div class="radio-option">
+                    <input type="radio" id="student" name="passengerType" value="student">
+                    <label for="student">Student</label>
                 </div>
             </div>
-
-            <div class="form-group">
-                <div class="inline-group">
-                    <label for="seatNo">Seat No.</label>
-                    <button class="action-button" onclick="redirectToSeatSelection()">Find seat</button>
-                    <label for="busId">Bus ID: <span class="auto-generated">NO-012-123</span></label>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>From: <span class="auto-generated">Zamboanga</span></label>
-            </div>
-
-            <div class="form-group">
-                <label>To: <span class="auto-generated">Manila</span></label>
-            </div>
-
-            <div class="form-group">
-                <label>Departure: <span class="auto-generated">6AM</span></label>
-            </div>
-
-            <div class="form-group">
-                <label>Arrival: <span class="auto-generated">10PM</span></label>
-            </div>
-
-            <div class="form-group">
-                <div class="inline-group">
-                    <label>ID Verification:</label>
-                    <button class="action-button">Upload ID</button>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Price: <span class="auto-generated">PHP 750.00</span></label>
-            </div>
-
-            <div class="form-group">
-                <label for="remarks">Remarks:</label>
-                <textarea id="remarks" name="remarks"></textarea>
-            </div>
-
-            <button class="print-button">Print ticket</button>
         </div>
     </div>
+    
+    <!-- Seat Selection -->
+    <div class="form-group">
+        <div class="inline-group">
+            <label for="seatNo">Selected Seats:</label>
+            <input type="text" id="seatNo" name="seatNo" readonly placeholder="No seats selected">
+            <button type="button" class="action-button" onclick="redirectToSeatSelection()">Find Seats</button>
+        </div>
+    </div>
+
+    <!-- Trip Information -->
+    <div class="trip-info-container">
+        <h3>Trip Information</h3>
+        <div class="form-group">
+            <label>Bus ID: <span id="busId" class="auto-generated"></span></label>
+        </div>
+
+        <div class="form-group">
+            <label>From: <span id="fromLocation" class="auto-generated"></span></label>
+        </div>
+
+        <div class="form-group">
+            <label>To: <span id="toLocation" class="auto-generated"></span></label>
+        </div>
+
+        <div class="form-group">
+            <label>Departure: <span id="departureTime" class="auto-generated"></span></label>
+        </div>
+
+        <div class="form-group">
+            <label>Arrival: <span id="arrivalTime" class="auto-generated"></span></label>
+        </div>
+    </div>
+
+    <!-- ID Verification -->
+    <div class="form-group">
+        <div class="id-verification">
+            <label>ID Verification:</label>
+            <div class="file-upload">
+                <input type="file" id="idFile" name="idFile" accept="image/*" style="display: none;">
+                <button type="button" class="action-button" onclick="document.getElementById('idFile').click()">Upload ID</button>
+                <span id="fileNameDisplay">No file selected</span>
+            </div>
+            <div class="verification-note">
+                <small>*Required for PWD/Senior/Student discounts</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pricing Information -->
+    <div class="pricing-container">
+        <h3>Pricing Details</h3>
+        <div class="form-group">
+            <label>Base Price: <span id="basePrice" class="auto-generated">PHP </span></label>
+        </div>
+        <div class="form-group">
+            <label>Discount: <span id="discount" class="auto-generated">PHP </span></label>
+        </div>
+        <div class="form-group">
+            <label>Total Price: <span id="totalPrice" class="auto-generated">PHP </span></label>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+        <button type="button" class="print-button" onclick="processBooking()">Confirm & Print Ticket</button>
+        <button type="button" class="cancel-button" onclick="cancelBooking()">Cancel</button>
+    </div>
+</div>
 
     <!-- Footer -->
     <div class="footer"></div>
@@ -188,6 +218,7 @@
         }
     </script>
 
+<script src="ticket_form"></script>
 
 </body>
 </html>

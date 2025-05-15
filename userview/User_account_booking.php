@@ -37,7 +37,7 @@
     <img src="../images/Homepage_image1.png" alt="Bus Interior" class="header-image" />
   </div>
   <div class="search-box">
-    <h2>Choose your travel location</h2>
+    <h2>Choose your travel destination</h2>
   </div>
 
   <div class="user-container">

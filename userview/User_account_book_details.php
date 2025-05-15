@@ -43,42 +43,18 @@
             </div>
         </div>
 
-        <div class="bus-details" id="bus">
-                <div class="detail-row">
+        <div class="bus-details" id="book-details"></div>
+                <!-- <div class="detail-row">
                     <div class="detail-label">BUS ID:</div>
-                    <div class="detail-value" id="busDisplay"></div>
-                </div>
-                <div class="detail-row">
                     <div class="detail-label">From:</div>
-                    <div class="detail-value" id="fromDisplay"></div>
-                </div>
-                <div class="detail-row">
                     <div class="detail-label">To:</div>
-                    <div class="detail-value" id="toDisplay"></div>
-                </div>
-                <div class="detail-row">
                     <div class="detail-label">Departure:</div>
-                    <div class="detail-value" id="departureDisplay"></div>
-                </div>
-                <div class="detail-row">
                     <div class="detail-label">Arrival:</div>
-                    <div class="detail-value" id="arrivalDisplay"></div>
-                </div>
-                <div class="detail-row">
                     <div class="detail-label">Bus Type:</div>
-                    <div class="detail-value" id="typeDisplay"></div>
-                </div>
-                <div class="detail-row">
                     <div class="detail-label">Price:</div>
-                    <div class="detail-value" id="priceDisplay"></div>
-                </div>
-                <div class="detail-row">
                     <div class="detail-label">Available Seats:</div>
-                    <div class="detail-value" id="seatsDisplay"></div>
                 </div>
-
-                <button class="book-button" >Book now</button>
-        </div>
+                <button class="book-button" >Book now</button> -->
     </div>
 
     <div class="footer"></div>
