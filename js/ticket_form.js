@@ -175,20 +175,26 @@ function createNewBooking(passengerId, busId, name, passengerType, selectedSeat,
         body: formData
     })
         .then(response => {
-            if (!response.ok) throw new Error('Booking request failed');
+            console.log('Booking API response status:', response.status);
+            if (!response.ok) {
+                return response.json().then(data => {
+                    throw new Error(`Booking request failed: ${response.status} - ${data.message || 'Unknown error'}`);
+                });
+            }
             return response.json();
         })
         .then(data => {
-            if (data.status === 'success') {
+            console.log('Booking API response data:', data);
+            if (data.status === 'success' && data.booking_id && data.reference) {
                 alert('Booking successful! Reference: ' + data.reference);
                 window.location.href = `user_profile.php?id=${data.booking_id}`;
             } else {
-                alert('Error: ' + data.message);
+                throw new Error(data.message || 'Invalid response from server');
             }
         })
         .catch(error => {
             console.error('Error creating booking:', error);
-            alert('Failed to create booking. Please try again.');
+            alert('Failed to create booking: ' + error.message);
         });
 }
 
