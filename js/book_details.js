@@ -1,92 +1,127 @@
 document.addEventListener("DOMContentLoaded", function() {
-    console.log("DOM fully loaded, calling getAllBusDetails()");
-    getAllBusDetails();
+    console.log("Book details page loaded");
+    
+    // Get bus ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const busId = urlParams.get('id');
+    
+    if (busId) {
+        console.log(`Fetching details for bus ID: ${busId}`);
+        getBusDetails(busId);
+    } else {
+        console.error("No bus ID provided in URL");
+        const busDetailsContainer = document.getElementById("book-details");
+        if (busDetailsContainer) {
+            busDetailsContainer.innerHTML = '<p class="error-message">No bus selected. Please go back and select a bus.</p>';
+        }
+    }
 
-    function getAllBusDetails() {
-        console.log("Fetching all buses...");
-        fetch("../api/bus_api.php")
+    function getBusDetails(id) {
+        fetch(`../api/bus_api.php?id=${id}`)
             .then(response => {
                 console.log("API Response status:", response.status);
                 return response.json();
             })
             .then(data => {
                 console.log("API Response data:", data);
-                if (data.status === "success") {
-                    console.log("Buses received:", data.buses);
-                    displayBusDetails(data.buses);
+                if (data.status === "success" && data.bus) {
+                    console.log("Bus details received:", data.bus);
+                    displayBusDetails(data.bus);
                 } else {
-                    console.error("Error fetching buses:", data.message);
-                    const busContainer = document.getElementById("book-details");
-                    if (busContainer) {
-                        busContainer.innerHTML = `<p class="error-message">Failed to load bus data: ${data.message || "Unknown error"}</p>`;
+                    console.error("Error fetching bus details:", data.message);
+                    const busDetailsContainer = document.getElementById("book-details");
+                    if (busDetailsContainer) {
+                        busDetailsContainer.innerHTML = `<p class="error-message">Failed to load bus details: ${data.message || "Bus not found"}</p>`;
                     }
                 }
             })
             .catch(error => {
-                console.error("Error fetching buses:", error);
-                const busContainer = document.getElementById("book-details");
-                if (busContainer) {
-                    busContainer.innerHTML = `<p class="error-message">Failed to load bus data. Please try again later.</p>`;
+                console.error("Error fetching bus details:", error);
+                const busDetailsContainer = document.getElementById("book-details");
+                if (busDetailsContainer) {
+                    busDetailsContainer.innerHTML = `<p class="error-message">Failed to load bus details. Please try again later.</p>`;
                 }
             });
     }
 
-    function displayBusDetails(buses) {
-        console.log("Displaying buses:", buses);
-        const busContainer = document.getElementById("book-details");
+    function displayBusDetails(bus) {
+        console.log("Displaying bus details:", bus);
+        const busDetailsContainer = document.getElementById("book-details");
         
-        if (!busContainer) {
+        if (!busDetailsContainer) {
             console.error("Error: book-details element not found in the DOM");
             return;
         }
         
-        busContainer.innerHTML = '';
+        busDetailsContainer.innerHTML = '';
         
-        if (!buses || buses.length === 0) {
-            console.log("No buses to display");
-            busContainer.innerHTML = '<p class="no-trips">No buses available at the moment.</p>';
+        if (!bus) {
+            console.log("No bus details to display");
+            busDetailsContainer.innerHTML = '<p class="error-message">Bus information not available.</p>';
             return;
         }
         
-        console.log(`Creating ${buses.length} bus cards...`);
+        const formattedPrice = parseFloat(bus.price).toFixed(2);
         
-        buses.forEach((bus) => {
-            const busCard = document.createElement("div");
-            busCard.className = "detail-row";
-            busCard.dataset.id = bus.bus_id;
-            
-            // Create the bus details container
-            const busDetails = document.createElement("div");
-            busDetails.className = "bus-details";
-            
-            const formattedPrice = parseFloat(bus.price).toFixed(2);
-            
-            busDetails.innerHTML = `
-                <p class="bus-id">Bus: ${bus.bus_number}</p>
-                <p class="bus-route">Route: ${bus.location} → ${bus.destination}</p>
-                <p class="bus-time">Departure: ${bus.departure_time}</p>
-                <p class="bus-time">Arrival: ${bus.arrival_time}</p>
-                <p class="bus-price">Price: PHP ${formattedPrice}</p>
-                <p class="bus-status">Status: ${bus.status}</p>
-                <p class="bus-seats">Available Seats: ${bus.available_seats}</p>
-                <p class="bus-type">Bus Type: ${bus.bus_type}</p>
-            `;
-            
-            // Add the bus details to the bus card
-            busCard.appendChild(busDetails);
-            
-            const bookButton = document.createElement("button");
-            bookButton.className = "book-button";
-            bookButton.textContent = "Book now";
-            bookButton.onclick = function() {
-                window.location.href = `User_account_ticket_form.php?id=${bus.bus_id}`;
-            };
-            
-            busCard.appendChild(bookButton);
-            
-            busContainer.appendChild(busCard);
-        });
+        // Create the bus details display
+        const detailsContainer = document.createElement("div");
+        detailsContainer.className = "detail-row";
         
-        console.log("Bus display complete");
+        detailsContainer.innerHTML = `
+            <div class="detail-item">
+                <div class="detail-label">BUS ID:</div>
+                <div class="detail-value">${bus.bus_id}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Bus Number:</div>
+                <div class="detail-value">${bus.bus_number}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">From:</div>
+                <div class="detail-value">${bus.location}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">To:</div>
+                <div class="detail-value">${bus.destination}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Departure:</div>
+                <div class="detail-value">${bus.departure_time}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Arrival:</div>
+                <div class="detail-value">${bus.arrival_time}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Bus Type:</div>
+                <div class="detail-value">${bus.bus_type}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Price:</div>
+                <div class="detail-value">PHP ${formattedPrice}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Available Seats:</div>
+                <div class="detail-value">${bus.available_seats}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Status:</div>
+                <div class="detail-value">${bus.status}</div>
+            </div>
+        `;
+        
+        busDetailsContainer.appendChild(detailsContainer);
+        
+        // Add the book button
+        const bookButton = document.createElement("button");
+        bookButton.className = "book-button";
+        bookButton.textContent = "Book now";
+        bookButton.onclick = function() {
+            window.location.href = `User_account_ticket_form.php?id=${bus.bus_id}`;
+        };
+        
+        busDetailsContainer.appendChild(bookButton);
+        
+        console.log("Bus details display complete");
     }
 });

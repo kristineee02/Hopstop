@@ -46,6 +46,7 @@
         <div class="bus-details" id="book-details"></div>
                 <!-- <div class="detail-row">
                     <div class="detail-label">BUS ID:</div>
+                    <div class="detail-value"></div>
                     <div class="detail-label">From:</div>
                     <div class="detail-label">To:</div>
                     <div class="detail-label">Departure:</div>

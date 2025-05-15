@@ -1,313 +1,175 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Set up profile dropdown toggle
+    // Profile dropdown toggle
     const profileButton = document.getElementById('profileButton');
     const profileDropdown = document.getElementById('profileDropdown');
+    if (profileButton && profileDropdown) {
+        profileButton.addEventListener('click', function(event) {
+            event.stopPropagation();
+            profileDropdown.classList.toggle('show');
+            console.log('Profile dropdown toggled');
+        });
+        window.addEventListener('click', function(event) {
+            if (!profileButton.contains(event.target) && !profileDropdown.contains(event.target)) {
+                profileDropdown.classList.remove('show');
+                console.log('Profile dropdown closed');
+            }
+        });
+    } else {
+        console.error('Profile button or dropdown not found');
+    }
 
-    //SEAT SELECTIO MODAL 
+    // Seat selection modal
     const seatModal = document.getElementById('seat-modal');
     const closeSeatModal = document.getElementById('close-seat-modal');
     const selectSeatBtn = document.getElementById('select-seat-btn');
     const seatNumberInput = document.getElementById('seat-number');
     const ticketForm = document.getElementById('ticket-form');
-    
-    if (profileButton && profileDropdown) {
-        profileButton.addEventListener('click', function() {
-            profileDropdown.classList.toggle('active');
-        });
-    }
-    
+
     // Get URL parameters
     const urlParams = new URLSearchParams(window.location.search);
-    const busId = urlParams.get('bus_id');
-    const seatNumber = urlParams.get('seat');
-    
-    // If seat number is provided in URL, populate the field
-    if (seatNumber) {
-        const seatNoInput = document.getElementById('seatNo');
-        if (seatNoInput) {
-            seatNoInput.value = seatNumber;
-        }
+    console.log('URL Parameters:', Object.fromEntries(urlParams)); // Debug all parameters
+    let busId = urlParams.get('bus_id') || urlParams.get('id'); // Fallback to 'id'
+
+    // Require bus_id; show error if missing
+    if (!busId) {
+        console.error('No bus_id or id parameter found in URL:', window.location.href);
+        alert('No bus selected. Please choose a bus.');
+        window.location.href = 'User.php';
+        return;
     }
-    
+
+    // If seat number is provided, populate the field
+    const seatNumber = urlParams.get('seat');
+    if (seatNumber && seatNumberInput) {
+        seatNumberInput.value = seatNumber;
+    } else if (seatNumber) {
+        console.warn('Seat number input not found');
+    }
+
     // Set up event listeners
     const idFileInput = document.getElementById('idFile');
     if (idFileInput) {
         idFileInput.addEventListener('change', updateFileName);
+    } else {
+        console.warn('ID file input not found');
     }
-    
-    // Set up passenger type radio buttons to calculate discount
+
+    // Passenger type radio buttons for discount
     const passengerTypeRadios = document.querySelectorAll('input[name="passengerType"]');
     passengerTypeRadios.forEach(radio => {
         radio.addEventListener('change', calculatePrice);
     });
 
-    // If bus ID is provided, get specific bus details, otherwise get all buses
-    if (busId) {
-        getBusDetails(busId);
+    // Seat selection button
+    if (selectSeatBtn) {
+        selectSeatBtn.addEventListener('click', () => getAvailableSeats(busId));
     } else {
-        getAllBusDetails();
+        console.warn('Select seat button not found');
     }
+
+    // Close seat modal
+    if (closeSeatModal && seatModal) {
+        closeSeatModal.addEventListener('click', () => {
+            seatModal.style.display = 'none';
+        });
+    } else {
+        console.warn('Close seat modal or modal not found');
+    }
+
+    // Hide seat modal initially
+    if (seatModal) {
+        seatModal.style.display = 'none';
+    }
+
+    // Fetch bus details
+    getBusDetails(busId);
 });
 
 function getBusDetails(busId) {
     console.log("Fetching bus details for ID:", busId);
-    fetch(`../api/bus_api.php?bus_id=${busId}`)
+    fetch(`../api/bus_api.php?id=${busId}`)
         .then(response => {
             console.log("API Response status:", response.status);
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             return response.json();
         })
         .then(data => {
             console.log("API Response data:", data);
-            if (data.status === "success") {
+            if (data.status === "success" && data.bus) {
                 console.log("Bus details received:", data.bus);
-                displayBusDetails([data.bus]); // Pass as array for consistency with getAllBusDetails
+                displayBusDetails(data.bus);
             } else {
-                console.error("Error fetching bus details:", data.message);
-                const busContainer = document.getElementById("trip-info");
-                if (busContainer) {
-                    busContainer.innerHTML = `<p class="error-message">Failed to load bus data: ${data.message || "Unknown error"}</p>`;
-                }
+                throw new Error(data.message || "Bus not found");
             }
         })
         .catch(error => {
             console.error("Error fetching bus details:", error);
-            const busContainer = document.getElementById("trip-info");
-            if (busContainer) {
-                busContainer.innerHTML = `<p class="error-message">Failed to load bus data. Please try again later.</p>`;
+            const tripInfoContainer = document.getElementById("trip-info");
+            if (tripInfoContainer) {
+                tripInfoContainer.innerHTML = `<p class="error-message">Failed to load bus data: ${error.message}</p>`;
             }
+            setTimeout(() => {
+                alert('Invalid bus selection. Redirecting to home.');
+                window.location.href = 'User.php';
+            }, 2000);
         });
 }
 
-function getAllBusDetails() {
-    console.log("Fetching all buses...");
-    fetch("../api/bus_api.php")
-        .then(response => {
-            console.log("API Response status:", response.status);
-            return response.json();
-        })
-        .then(data => {
-            console.log("API Response data:", data);
-            if (data.status === "success") {
-                console.log("Buses received:", data.buses);
-                displayBusDetails(data.buses);
-            } else {
-                console.error("Error fetching buses:", data.message);
-                const busContainer = document.getElementById("trip-info");
-                if (busContainer) {
-                    busContainer.innerHTML = `<p class="error-message">Failed to load bus data: ${data.message || "Unknown error"}</p>`;
-                }
-            }
-        })
-        .catch(error => {
-            console.error("Error fetching buses:", error);
-            const busContainer = document.getElementById("trip-info");
-            if (busContainer) {
-                busContainer.innerHTML = `<p class="error-message">Failed to load bus data. Please try again later.</p>`;
-            }
-        });
-}
-
-function displayBusDetails(buses) {
-    if (!buses || buses.length === 0) {
+function displayBusDetails(bus) {
+    if (!bus) {
         console.error("No bus data received");
         return;
     }
-    
-    // Use the first bus in the list (or the specific bus requested)
-    const bus = buses[0];
-    
-    // Get bus details container
+
     const tripInfoContainer = document.getElementById("trip-info");
     if (!tripInfoContainer) {
         console.error("Trip info container not found");
         return;
     }
-    
-    // Create the bus details container
-    const busDetails = document.createElement("div");
-    busDetails.innerHTML = `
-        <h3>Trip Information</h3>
-        <div class="form-group">
-            <label>Bus Number: <span class="auto-generated" id="busId">${bus.bus_number}</span></label>
-        </div>
-        <div class="form-group">
-            <label>From: <span class="auto-generated">${bus.location || 'N/A'}</span></label>
-        </div>
-        <div class="form-group">
-            <label>To: <span class="auto-generated">${bus.destination || 'N/A'}</span></label>
-        </div>
-        <div class="form-group">
-            <label>Departure: <span class="auto-generated">${formatTime(bus.departure_time) || 'N/A'}</span></label>
-        </div>
-        <div class="form-group">
-            <label>Arrival: <span class="auto-generated">${formatTime(bus.arrival_time) || 'N/A'}</span></label>
-        </div>
-    `;
-    
-    // Replace the existing content with the new bus details
-    tripInfoContainer.innerHTML = '';
-    tripInfoContainer.appendChild(busDetails);
-    
+
+    // Update auto-generated spans in order: Bus ID, From, To, Departure, Arrival
+    const spans = tripInfoContainer.querySelectorAll('.auto-generated');
+    if (spans.length >= 5) {
+        spans[0].textContent = bus.bus_number || 'N/A'; // Bus ID
+        spans[1].textContent = bus.location || 'N/A'; // From
+        spans[2].textContent = bus.destination || 'N/A'; // To
+        spans[3].textContent = formatTime(bus.departure_time) || 'N/A'; // Departure
+        spans[4].textContent = formatTime(bus.arrival_time) || 'N/A'; // Arrival
+    } else {
+        console.error("Not enough auto-generated spans found");
+    }
+
     // Set base price
     const price = parseFloat(bus.price) || 0;
-    document.getElementById('basePrice').textContent = 'PHP ' + price.toFixed(2);
-    
-    // Store price as data attribute for calculations
-    document.getElementById('basePrice').setAttribute('data-price', price);
-    
+    const basePriceElement = document.getElementById('basePrice');
+    if (basePriceElement) {
+        basePriceElement.textContent = 'PHP ' + price.toFixed(2);
+        basePriceElement.setAttribute('data-price', price);
+    } else {
+        console.warn('Base price element not found');
+    }
+
     // Initialize price calculations
     calculatePrice();
 }
 
-function formatTime(timeString) {
-    if (!timeString) return 'N/A';
-    try {
-        const date = new Date(`2000-01-01T${timeString}`);
-        return date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-    } catch (e) {
-        console.error('Error formatting time:', e);
-        return timeString; // Return original string if formatting fails
-    }
-}
-
-function updateFileName() {
-    const fileInput = document.getElementById('idFile');
-    const fileNameDisplay = document.getElementById('fileNameDisplay');
-    
-    if (fileInput.files.length > 0) {
-        fileNameDisplay.textContent = fileInput.files[0].name;
-    } else {
-        fileNameDisplay.textContent = 'No file selected';
-    }
-}
-
-function calculatePrice() {
-    const basePriceElement = document.getElementById('basePrice');
-    if (!basePriceElement) return;
-    
-    const basePrice = parseFloat(basePriceElement.getAttribute('data-price') || 0);
-    let discount = 0;
-    
-    // Check passenger type for discount
-    const passengerType = document.querySelector('input[name="passengerType"]:checked')?.value;
-    
-    if (passengerType === 'pwd' || passengerType === 'student') {
-        // 20% discount for PWD/Senior/Student
-        discount = basePrice * 0.2;
-    }
-    
-    const totalPrice = basePrice - discount;
-    
-    // Update price displays
-    document.getElementById('discount').textContent = 'PHP ' + discount.toFixed(2);
-    document.getElementById('totalPrice').textContent = 'PHP ' + totalPrice.toFixed(2);
-}
-
-function redirectToSeatSelection() {
-    const busIdElement = document.getElementById('busId');
-    if (!busIdElement || !busIdElement.textContent) {
-        alert('Please wait for bus details to load');
-        return;
-    }
-    window.location.href = `User_account_seatSelection.php?bus_id=${busIdElement.textContent}`;
-}
-
-function processBooking() {
-    // Validate form
-    const name = document.getElementById('name').value;
-    const selectedSeats = document.getElementById('seatNo').value;
-    const passengerType = document.querySelector('input[name="passengerType"]:checked')?.value;
-    const remarks = document.getElementById('remarks').value;
-    
-    if (!name) {
-        alert('Please enter passenger name');
-        return;
-    }
-    
-    if (!passengerType) {
-        alert('Please select passenger type');
-        return;
-    }
-    
-    if (!selectedSeats) {
-        alert('Please select a seat');
-        return;
-    }
-    
-    // Check if ID upload is required for discounted passengers
-    const idFile = document.getElementById('idFile').files[0];
-    if ((passengerType === 'pwd' || passengerType === 'student') && !idFile) {
-        alert('Please upload ID for discount verification');
-        return;
-    }
-
-    // Get passenger ID from session (this would be set during login)
-    // For this example, we'll use a placeholder
-    const passengerId = 1; // Replace with actual passenger ID from session
-    
-    // Create FormData object for file upload
-    const formData = new FormData();
-    formData.append('passenger_id', passengerId);
-    formData.append('bus_id', document.getElementById('busId').textContent);
-    formData.append('reserve_name', name);
-    formData.append('passenger_type', passengerType);
-    formData.append('seat_number', selectedSeats);
-    formData.append('remarks', remarks || '');
-    
-    if (idFile) {
-        formData.append('id_file', idFile);
-    }
-    
-    // Submit booking via API
-    fetch('../api/booking_api.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            alert('Booking successful! Reference: ' + data.reference);
-            // Redirect to ticket view/print page
-            window.location.href = `ticket_view.php?id=${data.booking_id}`;
-        } else {
-            alert('Error: ' + data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Failed to create booking. Please try again.');
-    });
-}
-
-function cancelBooking() {
-    if (confirm('Are you sure you want to cancel this booking?')) {
-        window.location.href = 'User.php';
-    }
-}
-
-// Function to fetch and display available seats
-async function getAllSBusDetails(busId) {
-    if (selectSeatBtn) {
-        selectSeatBtn.addEventListener('click', function() {
-            fetchBusDetails(busId);
-        });
-    }
-    
-    // Close modal when close button is clicked
-    if (closeSeatModal) {
-        closeSeatModal.addEventListener('click', function() {
-            seatModal.style.display = 'none';
-        });
-    }
-    try {
-        const response = await fetch(`../api/booking_api.php?bus_id=${busId}`);
-        const data = await response.json();
-
-        if (data.success && data.available_seats) {
+function getAvailableSeats(busId) {
+    console.log("Fetching available seats for bus ID:", busId);
+    fetch(`../api/booking_api.php?bus_id=${busId}`)
+        .then(response => {
+            console.log("Seat API Response status:", response.status);
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            return response.json();
+        })
+        .then(data => {
+            console.log("Seat API Response:", data);
             const seatMap = document.getElementById('seat-map');
-            if (seatMap) {
-                seatMap.innerHTML = '';
-
+            if (!seatMap) {
+                console.error('Seat map not found');
+                return;
+            }
+            seatMap.innerHTML = '';
+            if (data.success && data.available_seats) {
                 if (data.available_seats.length === 0) {
                     seatMap.textContent = "No seats available.";
                 } else {
@@ -317,27 +179,166 @@ async function getAllSBusDetails(busId) {
                         seatBtn.textContent = seat;
                         seatBtn.classList.add('seat-button');
                         seatBtn.addEventListener('click', () => {
-                            if (seatNumberInput) {
-                                seatNumberInput.value = seat;
+                            const seatInput = document.getElementById('seat-number');
+                            if (seatInput) {
+                                seatInput.value = seat;
+                            } else {
+                                console.warn('Seat number input not found');
                             }
-                            if (seatModal) {
-                                seatModal.style.display = 'none';
+                            const modal = document.getElementById('seat-modal');
+                            if (modal) {
+                                modal.style.display = 'none';
                             }
                         });
                         seatMap.appendChild(seatBtn);
                     });
                 }
+                const modal = document.getElementById('seat-modal');
+                if (modal) {
+                    modal.style.display = 'flex';
+                }
+            } else {
+                alert(data.message || 'Error fetching seats');
             }
-            
-            if (seatModal) {
-                seatModal.style.display = 'flex';
-            }
-        } else {
-            alert(data.message || 'Error fetching seats');
-        }
-    } catch (err) {
-        console.error(err);
-        alert('Failed to fetch seat data.');
+        })
+        .catch(error => {
+            console.error("Error fetching seats:", error);
+            alert('Failed to fetch seat data.');
+        });
+}
+
+function formatTime(timeString) {
+    if (!timeString) return 'N/A';
+    try {
+        const date = new Date(`2000-01-01T${timeString}`);
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } catch (e) {
+        console.error('Error formatting time:', e);
+        return timeString;
     }
 }
 
+function updateFileName() {
+    const fileInput = document.getElementById('idFile');
+    const fileNameDisplay = document.getElementById('fileNameDisplay');
+    if (fileInput && fileNameDisplay) {
+        fileNameDisplay.textContent = fileInput.files.length > 0 ? fileInput.files[0].name : 'No file selected';
+    } else {
+        console.warn('File input or display not found');
+    }
+}
+
+function calculatePrice() {
+    const basePriceElement = document.getElementById('basePrice');
+    if (!basePriceElement) {
+        console.warn('Base price element not found');
+        return;
+    }
+
+    const basePrice = parseFloat(basePriceElement.getAttribute('data-price') || 0);
+    let discount = 0;
+
+    const passengerType = document.querySelector('input[name="passengerType"]:checked')?.value;
+    if (passengerType === 'pwd' || passengerType === 'student') {
+        discount = basePrice * 0.2;
+    }
+
+    const totalPrice = basePrice - discount;
+    const discountElement = document.getElementById('discount');
+    const totalPriceElement = document.getElementById('totalPrice');
+    if (discountElement) {
+        discountElement.textContent = 'PHP ' + discount.toFixed(2);
+    } else {
+        console.warn('Discount element not found');
+    }
+    if (totalPriceElement) {
+        totalPriceElement.textContent = 'PHP ' + totalPrice.toFixed(2);
+    } else {
+        console.warn('Total price element not found');
+    }
+}
+
+function processBooking() {
+    const name = document.getElementById('name')?.value;
+    const selectedSeats = document.getElementById('seat-number')?.value;
+    const passengerType = document.querySelector('input[name="passengerType"]:checked')?.value;
+    const remarks = document.getElementById('remarks')?.value;
+    const busId = document.querySelector('#trip-info .auto-generated')?.textContent;
+
+    if (!name) {
+        alert('Please enter passenger name');
+        return;
+    }
+    if (!passengerType) {
+        alert('Please select passenger type');
+        return;
+    }
+    if (!selectedSeats) {
+        alert('Please select a seat');
+        return;
+    }
+    if (!busId) {
+        alert('Bus details not loaded');
+        return;
+    }
+
+    const idFile = document.getElementById('idFile')?.files[0];
+    if ((passengerType === 'pwd' || passengerType === 'student') && !idFile) {
+        alert('Please upload ID for discount verification');
+        return;
+    }
+
+    // Fetch passenger_id from session
+    fetch('../api/store_session.php')
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success' && data.passengerId) {
+                const passengerId = data.passengerId;
+                submitBooking(passengerId, busId, name, passengerType, selectedSeats, remarks, idFile);
+            } else {
+                throw new Error('User not authenticated');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching session:', error);
+            alert('Please log in to create a booking.');
+            window.location.href = 'User.php';
+        });
+}
+
+function submitBooking(passengerId, busId, name, passengerType, selectedSeats, remarks, idFile) {
+    const formData = new FormData();
+    formData.append('passenger_id', passengerId);
+    formData.append('bus_id', busId);
+    formData.append('reserve_name', name);
+    formData.append('passenger_type', passengerType);
+    formData.append('seat_number', selectedSeats);
+    formData.append('remarks', remarks || '');
+    if (idFile) {
+        formData.append('id_file', idFile);
+    }
+
+    fetch('../api/booking_api.php', {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert('Booking successful! Reference: ' + data.reference);
+                window.location.href = `ticket_view.php?id=${data.booking_id}`;
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to create booking. Please try again.');
+        });
+}
+
+function cancelBooking() {
+    if (confirm('Are you sure you want to cancel this booking?')) {
+        window.location.href = 'User.php';
+    }
+}

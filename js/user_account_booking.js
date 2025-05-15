@@ -1,8 +1,89 @@
 document.addEventListener("DOMContentLoaded", function() {
-    console.log("DOM fully loaded, calling getAllBus()");
-    getAllBus();
+    console.log("DOM fully loaded, checking for search parameters");
+    
+    // Get search parameters from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const location = urlParams.get('location');
+    const destination = urlParams.get('destination');
+    const busId = urlParams.get('id');
+    
+    if (location && destination) {
+        // If we have search parameters, display buses based on search
+        searchBuses(location, destination);
+    } else if (busId) {
+        // If we have a bus ID, fetch and display only that bus
+        getBusById(busId);
+    } else {
+        // Otherwise, get all buses
+        getAllBuses();
+    }
+    
+    function searchBuses(location, destination) {
+        console.log(`Searching for buses from ${location} to ${destination}`);
+        
+        // Update search results heading
+        const tripHeading = document.querySelector(".trip");
+        if (tripHeading) {
+            tripHeading.textContent = `Available Tickets: ${location} to ${destination}`;
+        }
+        
+        fetch(`../api/bus_api.php?action=search&location=${encodeURIComponent(location)}&destination=${encodeURIComponent(destination)}`)
+            .then(response => {
+                console.log("API Response status:", response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log("Search API Response data:", data);
+                if (data.status === "success") {
+                    console.log("Buses received:", data.buses);
+                    displayBuses(data.buses);
+                } else {
+                    console.error("Error searching buses:", data.message);
+                    const tripsContainer = document.getElementById("trips-container");
+                    if (tripsContainer) {
+                        tripsContainer.innerHTML = `<p class="error-message">No buses available for this route. Please try a different route.</p>`;
+                    }
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching buses:", error);
+                const tripsContainer = document.getElementById("trips-container");
+                if (tripsContainer) {
+                    tripsContainer.innerHTML = `<p class="error-message">Failed to search buses. Please try again later.</p>`;
+                }
+            });
+    }
+    
+    function getBusById(id) {
+        console.log(`Fetching bus with ID: ${id}`);
+        fetch(`../api/bus_api.php?id=${id}`)
+            .then(response => {
+                console.log("API Response status:", response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log("API Response data:", data);
+                if (data.status === "success" && data.bus) {
+                    console.log("Bus received:", data.bus);
+                    displayBuses([data.bus]);
+                } else {
+                    console.error("Error fetching bus:", data.message);
+                    const tripsContainer = document.getElementById("trips-container");
+                    if (tripsContainer) {
+                        tripsContainer.innerHTML = `<p class="error-message">Failed to load bus data: ${data.message || "Bus not found"}</p>`;
+                    }
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching bus:", error);
+                const tripsContainer = document.getElementById("trips-container");
+                if (tripsContainer) {
+                    tripsContainer.innerHTML = `<p class="error-message">Failed to load bus data. Please try again later.</p>`;
+                }
+            });
+    }
 
-    function getAllBus() {
+    function getAllBuses() {
         console.log("Fetching all buses...");
         fetch("../api/bus_api.php")
             .then(response => {
@@ -13,7 +94,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 console.log("API Response data:", data);
                 if (data.status === "success") {
                     console.log("Buses received:", data.buses);
-                    displayBus(data.buses);
+                    displayBuses(data.buses);
                 } else {
                     console.error("Error fetching buses:", data.message);
                     const tripsContainer = document.getElementById("trips-container");
@@ -31,7 +112,7 @@ document.addEventListener("DOMContentLoaded", function() {
             });
     }
 
-    function displayBus(buses) {
+    function displayBuses(buses) {
         console.log("Displaying buses:", buses);
         const tripsContainer = document.getElementById("trips-container");
         
@@ -44,7 +125,7 @@ document.addEventListener("DOMContentLoaded", function() {
         
         if (!buses || buses.length === 0) {
             console.log("No buses to display");
-            tripsContainer.innerHTML = '<p class="no-trips">No buses available at the moment.</p>';
+            tripsContainer.innerHTML = '<p class="no-trips">No buses available matching your criteria.</p>';
             return;
         }
         
@@ -81,7 +162,7 @@ document.addEventListener("DOMContentLoaded", function() {
             bookButton.className = "book-button";
             bookButton.textContent = "Book now";
             bookButton.onclick = function() {
-                window.location.href = "User_account_book_details.php?id=${bus.bus_id}";
+                window.location.href = `User_account_book_details.php?id=${bus.bus_id}`;
             };
             
             // Add the button to the trip card

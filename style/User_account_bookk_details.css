@@ -176,19 +176,52 @@ header {
 
 .detail-row {
     display: flex;
-    margin-bottom: 10px;
+    flex-direction: column; /* Changed to column for vertical stacking */
+    margin-bottom: 15px; /* Increased spacing */
     font-size: 14px;
 }
 
+.detail-item {
+    display: flex;
+    flex-direction: column; /* Ensure items stack vertically */
+    padding: 12px 0;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+}
+
 .detail-label {
-    font-weight: bold;
-    width: 100px;
-    color: #555;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px; /* Added spacing between label and value */
+    font-size: 0.95rem;
 }
 
 .detail-value {
-    color: #333;
-    flex-grow: 1;
+    color: #505050;
+    font-size: 0.95rem;
+    text-align: left; /* Changed to left for better readability in column layout */
+}
+
+/* Highlight important information */
+.detail-item:nth-child(3), 
+.detail-item:nth-child(4),
+.detail-item:nth-child(8) {
+    background-color: #f9f9f9;
+}
+
+/* Price value special styling */
+.detail-item:nth-child(8) .detail-value {
+    font-weight: 700;
+    color: #2c5282;
+    font-size: 1.05rem;
+}
+
+/* Status value styling with color indicators */
+.detail-item:last-child .detail-value {
+    font-weight: 600;
 }
 
 .book-button {

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -143,7 +142,28 @@
 
 <script src="../js/User.js"></script>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const profileButton = document.getElementById('profileButton');
+    const profileDropdown = document.getElementById('profileDropdown');
+    console.log('profileButton:', profileButton);
+    console.log('profileDropdown:', profileDropdown);
+    if (profileButton && profileDropdown) {
+        profileButton.addEventListener('click', function(event) {
+            event.stopPropagation();
+            profileDropdown.classList.toggle('show');
+        });
+        window.addEventListener('click', function(event) {
+            if (!profileButton.contains(event.target) && !profileDropdown.contains(event.target)) {
+                profileDropdown.classList.remove('show');
+            }
+        });
+    } else {
+        console.error('Profile button or dropdown not found');
+    }
+});
 
+</script>
 
 </body>
 </html>

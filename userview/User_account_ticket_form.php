@@ -8,7 +8,6 @@
     <script src="https://kit.fontawesome.com/yourcode.js" crossorigin="anonymous"></script>
     <title>HopStop - Ticket Form</title>
     <style>
-        /* Modal container */
 .modal {
   position: fixed;
   z-index: 1000;
@@ -17,13 +16,12 @@
   width: 100%;
   height: 100%;
   overflow: auto;
-  background-color: rgba(0,0,0,0.5); /* semi-transparent black background */
+  background-color: rgba(0,0,0,0.5); 
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-/* Modal content box */
 .modal-content {
   background-color: #fff;
   padding: 20px 30px;
@@ -34,7 +32,6 @@
   position: relative;
 }
 
-/* Close button (x) */
 .close {
   position: absolute;
   top: 12px;
@@ -49,7 +46,6 @@
   color: #000;
 }
 
-/* Seat map container */
 #seat-map {
   display: flex;
   flex-wrap: wrap;
@@ -60,7 +56,6 @@
   justify-content: center;
 }
 
-/* Individual seat button */
 .seat-button {
   background-color: #4caf50;
   border: none;
@@ -79,13 +74,6 @@
   background-color: #45a049;
 }
 
-/* Seat button disabled style (optional) */
-/* .seat-button.booked {
-  background-color: #ccc;
-  cursor: not-allowed;
-} */
-
-/* Ticket form styling */
 #ticket-form-section {
   max-width: 500px;
   margin: 20px auto;

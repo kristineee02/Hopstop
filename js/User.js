@@ -1,4 +1,3 @@
-// Search functionality
 document.addEventListener("DOMContentLoaded", function() {
     const searchForm = document.getElementById("search-form");
     const searchResultsContainer = document.getElementById("search-results");
@@ -19,8 +18,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 alert("Please fill in both from and to locations");
                 return;
             }
-
-            // Redirect to booking page with search parameters instead of making API call
+            // Redirect to booking page with search parameters
             window.location.href = `User_account_booking.php?location=${encodeURIComponent(fromInput)}&destination=${encodeURIComponent(toInput)}`;
         });
     } else {
@@ -44,8 +42,25 @@ function profile() {
     window.location.href = "user_profile.php";
 }
 
-function bookBus(busId) {
-    console.log("Booking bus:", busId);
-
-    window.location.href = `User_account_booking.php?bus_id=${busId}`;
-}
+// Profile dropdown functionality
+document.addEventListener("DOMContentLoaded", function() {
+    const profileButton = document.getElementById("profileButton");
+    const profileDropdown = document.getElementById("profileDropdown");
+    
+    if (profileButton && profileDropdown) {
+        profileButton.addEventListener("click", function() {
+            profileDropdown.classList.toggle("show");
+        });
+        
+        // Close the dropdown when clicking outside
+        window.addEventListener("click", function(event) {
+            if (!event.target.matches("profileButton") && 
+                !event.target.closest("profileButton") && 
+                !event.target.closest("profileDropdown")) {
+                if (profileDropdown.classList.contains("show")) {
+                    profileDropdown.classList.remove("show");
+                }
+            }
+        });
+    }
+});
