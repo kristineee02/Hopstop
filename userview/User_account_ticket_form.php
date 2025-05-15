@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../style/User_account_ticket_form.css">
     <script src="../js/Userlogout.js"></script>
+    <script src="https://kit.fontawesome.com/yourcode.js" crossorigin="anonymous"></script>
     <title>HopStop - Ticket Form</title>
 
 </head>
@@ -26,7 +26,7 @@
               </nav>
              
               <div class="user-profile" id="profileButton">
-                  <i class ="fas fa-user-circle"></i>
+                  <i class="fas fa-user-circle"></i>
               </div>
              
               <div class="profile-dropdown" id="profileDropdown">
@@ -79,36 +79,36 @@
         </div>
     </div>
     
-    <!-- Seat Selection -->
-    <div class="form-group">
-        <div class="inline-group">
-            <label for="seatNo">Selected Seats:</label>
-            <input type="text" id="seatNo" name="seatNo" readonly placeholder="No seats selected">
-            <button type="button" class="action-button" onclick="redirectToSeatSelection()">Find Seats</button>
-        </div>
+       <!-- Seat selection modal -->
+       <div id="seat-modal">
+      <div class="modal-content">
+        <span class="close" id="close-seat-modal">&times;</span>
+        <h3>Select a Seat</h3>
+        <div id="seat-map"></div>
+      </div>
     </div>
 
     <!-- Trip Information -->
-    <div class="trip-info-container">
+    <div class="trip-info-container" id="trip-info">
         <h3>Trip Information</h3>
         <div class="form-group">
-            <label>Bus ID: <span id="busId" class="auto-generated"></span></label>
+            <label>Bus ID: <span class="auto-generated"></span></label>
         </div>
 
         <div class="form-group">
-            <label>From: <span id="fromLocation" class="auto-generated"></span></label>
+            <label>From: <span  class="auto-generated"></span></label>
         </div>
 
         <div class="form-group">
-            <label>To: <span id="toLocation" class="auto-generated"></span></label>
+            <label>To: <span class="auto-generated"></span></label>
         </div>
 
         <div class="form-group">
-            <label>Departure: <span id="departureTime" class="auto-generated"></span></label>
+            <label>Departure: <span class="auto-generated"></span></label>
         </div>
 
         <div class="form-group">
-            <label>Arrival: <span id="arrivalTime" class="auto-generated"></span></label>
+            <label>Arrival: <span class="auto-generated"></span></label>
         </div>
     </div>
 
@@ -131,15 +131,20 @@
     <div class="pricing-container">
         <h3>Pricing Details</h3>
         <div class="form-group">
-            <label>Base Price: <span id="basePrice" class="auto-generated">PHP </span></label>
+            <label>Base Price: <span id="basePrice" class="auto-generated">PHP 0.00</span></label>
         </div>
         <div class="form-group">
-            <label>Discount: <span id="discount" class="auto-generated">PHP </span></label>
+            <label>Discount: <span id="discount" class="auto-generated">PHP 0.00</span></label>
         </div>
         <div class="form-group">
-            <label>Total Price: <span id="totalPrice" class="auto-generated">PHP </span></label>
+            <label>Total Price: <span id="totalPrice" class="auto-generated">PHP 0.00</span></label>
         </div>
     </div>
+
+    <div class="form-group">
+            <label for="remarks">Remarks:</label>
+            <input type="text" id="remarks" placeholder="Remarks">
+        </div>
 
     <!-- Action Buttons -->
     <div class="action-buttons">
@@ -212,13 +217,9 @@
                 changeSlide(index);
             });
         });
-
-        function redirectToSeatSelection() {
-            window.location.href = "User_account_seatSelection.php";
-        }
     </script>
 
-<script src="ticket_form"></script>
+<script src="../js/ticket_form.js"></script>
 
 </body>
 </html>

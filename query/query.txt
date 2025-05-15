@@ -40,6 +40,7 @@ CREATE TABLE `bookings` (
   `seat_number` int(11) NOT NULL,
   `id_upload_path` varchar(255) DEFAULT NULL,
   `reference` varchar(50) NOT NULL,
+  remarks text not null,
   `status` enum('pending','confirmed','cancelled') NOT NULL DEFAULT 'pending',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   FOREIGN KEY(passenger_id) REFERENCES passenger(passenger_id),
