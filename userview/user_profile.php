@@ -90,43 +90,15 @@
                 </div>
             </section>
             <div class="booking-buttons">
-                <button class="cancel-btn" onclick="window.location.href='cancel.php';">Cancel Booking</button>
+                <button class="cancel-btn">Cancel Booking</button>
                 <button class="view-btn">View Ticket</button>
-            </div>
-            <div class="booking-header">
-                <h2>Booking History</h2>
-
-                <div class="button">
-                    <button class="arrow-button" onclick="toggleDropdown1()">
-                            <img src="../images/free-arrow-down-icon-3101-thumb.png" alt="arrow">
-                        </button>
-                </div>
-                <div class="dropdown-menu1" id="dropdownMenu1">
-                    <section class="booking-section-history">
-                        <div class="booking-scroll">
-                            <div class="booking-card-history">
-                                <nav>
-                                    <a href="#">Bus No. </a>
-                                    <a href="#">Location </a>
-                                    <a href="#">Destination</a>
-                                    <a href="#">Departure</a>
-                                    <a href="#">Arrival</a>
-                                    <a href="#">Seat No.</a>
-                                </nav>
-                            </div>
-                        </div>
-                    </section>
-                </div>
-
-                <div class="booking-buttons1">
-                    <button class="view-btn1">View Ticket</button>
-                </div>
             </div>
        </section>
    </div>
    
    <!-- Add script tags at the end of the body -->
    <script src="../js/user_script.js"></script>
+
 </body>
 
 </html>
