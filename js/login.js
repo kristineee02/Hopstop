@@ -6,11 +6,11 @@ document.addEventListener("DOMContentLoaded", function(){
 });
 
 function login(){
-
     const formData = {
         email: document.getElementById("email").value,
         password: document.getElementById("password").value
     }
+    
     fetch("../api/login_api.php", {
         method: "POST",
         body: JSON.stringify(formData),
@@ -21,16 +21,12 @@ function login(){
         if(data.status === "success"){
             if(data.accountType === "admin"){
                 const adminData = data.admins;
-
                 alert("Log In Successfully!");
                 storeSession(adminData);
-                window.location.href = "../admin/admin.php";
             }else if(data.accountType === "passenger"){
                 const passengerData = data.passengers;
-
                 alert("Log In Successfully!");
                 storeSession(passengerData);
-                window.location.href = "../userview/User.php"
             }else{
                 alert(data.message);
             }
@@ -39,7 +35,10 @@ function login(){
             alert(data.message);
         }
     })
-    .catch(error => console.error(error));
+    .catch(error => {
+        console.error("Login error:", error);
+        alert("Login failed. Please try again.");
+    });
 }
 
 function storeSession(data){
@@ -51,7 +50,20 @@ function storeSession(data){
     .then(response => response.json())
     .then(data => {
         if(data.status === "success"){
+            console.log("Session stored successfully");
+            // Redirect based on user type
+            if (data.passengerId) {
+                window.location.href = "../userview/User.php";
+            } else if (data.adminId) {
+                window.location.href = "../admin/admin.php";
+            }
+        } else {
+            console.error("Session storage failed:", data.message);
+            alert("Session storage failed. Please try again.");
         }
     })
-    .catch(error => console.error(error));
+    .catch(error => {
+        console.error("Session storage error:", error);
+        alert("Session storage failed. Please try again.");
+    });
 }

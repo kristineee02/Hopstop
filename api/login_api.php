@@ -7,6 +7,7 @@
     include "database.php";
     include "../class/Admin.php";
     include "../class/Passenger.php";
+    
     $database = new Database();
     $db = $database->getConnection();
 
@@ -28,19 +29,36 @@
             $password = $data["password"] ?? null;
         
             if ($email && $password) {
-                if($admins = $admin->admin_login($email, $password)){
-                    echo json_encode(["status" => "success", "accountType" => "admin", "admins" => $admins]);
-                }else if($passengers = $passenger->user_login($email, $password)){
-                    echo json_encode(["status" => "success", "accountType" => "passenger", "passengers" => $passengers]);
-                }else{
-                    echo json_encode(["status" => "error", "message" => "Invalid credentials"]);
+                // Try admin login
+                $adminResult = $admin->admin_login($email, $password);
+                if($adminResult){
+                    echo json_encode([
+                        "status" => "success", 
+                        "accountType" => "admin", 
+                        "admins" => $adminResult
+                    ]);
+                }
+                // Try passenger login
+                else if($passengerResult = $passenger->user_login($email, $password)){
+                    echo json_encode([
+                        "status" => "success", 
+                        "accountType" => "passenger", 
+                        "passengers" => $passengerResult
+                    ]);
+                }
+                // Both failed
+                else{
+                    echo json_encode([
+                        "status" => "error", 
+                        "message" => "Invalid credentials"
+                    ]);
                 }
             } else {
-                echo json_encode(["status" => "error", "message" => "Missing email or password"]);
+                echo json_encode([
+                    "status" => "error", 
+                    "message" => "Missing email or password"
+                ]);
             }
             break;
-            
-            
-            
     }
 ?>

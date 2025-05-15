@@ -11,7 +11,25 @@ function toggleDropdown1() {
     dropdown.classList.toggle("show");
 }
 
+function logOut() {
+    // Clear session and redirect to login page
+    fetch("../api/logout.php", {
+        method: "POST"
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.status === "success") {
+            window.location.href = "../login/login.php";
+        }
+    })
+    .catch(error => {
+        console.error('Error logging out:', error);
+        window.location.href = "../login/login.php"; // Redirect anyway if there's an error
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    // Profile dropdown toggle
     const profileButton = document.getElementById('profileButton');
     const profileDropdown = document.getElementById('profileDropdown');
     if (profileButton && profileDropdown) {
@@ -26,9 +44,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Initialize modal and fetch user data
     initModal();
     getPassenger();
 
+    // Set up profile update form submission
     const profileForm = document.getElementById("profileUpdateForm");
     if (profileForm) {
         profileForm.addEventListener("submit", function(event) {
@@ -58,6 +78,7 @@ function initModal() {
 }
 
 function getPassenger() {
+    // First, get the session data to retrieve the passenger ID
     fetch("../api/store_session.php")
         .then(response => {
             if (!response.ok) throw new Error('Session fetch failed');
@@ -65,10 +86,11 @@ function getPassenger() {
         })
         .then(data => {
             console.log('Session response:', data);
-            if (data.status === "success" && data.userId) {
-                return fetch(`../api/passenger_api.php?userId=${data.userId}`);
+            if (data.status === "success" && data.passengerId) {
+                // Now fetch passenger details using the ID
+                return fetch(`../api/passenger_api.php?passengerId=${data.passengerId}`);
             } else {
-                throw new Error("User not authenticated");
+                throw new Error(data.message || "User not authenticated");
             }
         })
         .then(response => {
@@ -78,13 +100,37 @@ function getPassenger() {
         .then(data => {
             console.log('Passenger response:', data);
             if (data.status === "success" && data.passengerData) {
+                // Update the UI with passenger data
                 const passenger = data.passengerData;
-                document.getElementById("imageDisplay2").src = passenger.picture ? `../Uploads/${passenger.picture}` : '../images/profile.png';
-                document.getElementById("nameDisplay2").textContent = `${passenger.first_name} ${passenger.last_name}`;
-                document.getElementById("userEmail").textContent = passenger.email;
-                document.getElementById("editfirstName").value = passenger.first_name;
-                document.getElementById("editlastName").value = passenger.last_name;
-                document.getElementById("edit-prof").setAttribute('data-current', passenger.picture || '');
+                
+                // Set profile image, using default if none exists
+                const imgElement = document.getElementById("imageDisplay2");
+                if (imgElement) {
+                    imgElement.src = passenger.picture ? `../Uploads/${passenger.picture}` : '../images/profile.png';
+                }
+                
+                // Set name display
+                const nameElement = document.getElementById("nameDisplay2");
+                if (nameElement) {
+                    nameElement.textContent = `${passenger.first_name} ${passenger.last_name}`;
+                }
+                
+                // Set email display
+                const emailElement = document.getElementById("userEmail");
+                if (emailElement) {
+                    emailElement.textContent = passenger.email;
+                }
+                
+                // Populate edit form fields
+                const firstNameField = document.getElementById("editfirstName");
+                if (firstNameField) {
+                    firstNameField.value = passenger.first_name;
+                }
+                
+                const lastNameField = document.getElementById("editlastName");
+                if (lastNameField) {
+                    lastNameField.value = passenger.last_name;
+                }
             } else {
                 throw new Error(data.message || "Failed to load passenger data");
             }
@@ -99,11 +145,20 @@ function updateProfile() {
     const formData = new FormData();
     formData.append('firstName', document.getElementById("editfirstName").value);
     formData.append('lastName', document.getElementById("editlastName").value);
+    
+    // Handle profile picture
     const profilePicInput = document.getElementById("edit-prof");
     if (profilePicInput.files[0]) {
-        formData.append('picture', profilePicInput.files[0]);
+        // Validate file
+        const file = profilePicInput.files[0];
+        if (file.size > 5 * 1024 * 1024 || !file.type.startsWith('image/')) {
+            alert('Profile picture must be an image under 5MB.');
+            return;
+        }
+        formData.append('picture', file);
     }
 
+    // Get session data to confirm user is logged in
     fetch("../api/store_session.php")
         .then(response => {
             if (!response.ok) throw new Error('Session fetch failed');
@@ -111,14 +166,14 @@ function updateProfile() {
         })
         .then(data => {
             console.log('Session response for update:', data);
-            if (data.status === "success" && data.userId) {
-                formData.append('passengerId', data.userId);
+            if (data.status === "success" && data.passengerId) {
+                // Send update request with passenger ID
                 return fetch("../api/passenger_api.php", {
                     method: "POST",
                     body: formData
                 });
             } else {
-                throw new Error("User not authenticated");
+                throw new Error(data.message || "User not authenticated");
             }
         })
         .then(response => {
@@ -129,7 +184,9 @@ function updateProfile() {
             console.log('Update response:', data);
             if (data.status === "success") {
                 alert("Profile updated successfully!");
-                window.location.reload();
+                document.getElementById("editProfileModal").classList.remove("show");
+                // Refresh profile data
+                getPassenger();
             } else {
                 throw new Error(data.message || "Update failed");
             }
