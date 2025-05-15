@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,7 +30,7 @@
                   <div class="dropdown-item">Logout</div>
               </div>
           </div>
-          <script src="../js/Userlogout.js"></script>
+          <script src="Userlogout.js"></script>
     </header>
 
     <div class="container4">
@@ -98,12 +97,11 @@
                 [29, 30, 0, 31, 32],  // Row 8
                 [33, 34, 0, 35, 36],  // Row 9
                 [37, 38, 0, 39, 40],  // Row 10
-                [41, 42, 0, 43, 44],  // Row 11
-                [45, 46, 0, 47, 48, 49]  // Row 12
+
             ];
 
             // Unavailable seats (numbers as shown in the UI)
-            const unavailableSeats = [3, 15, 23, 24, 48, 5, 7, 13, 35, 45];
+            const unavailableSeats = [];
             
             // Selected seats (initially empty, will be updated as user selects)
             let selectedSeats = [];

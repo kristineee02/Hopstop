@@ -78,7 +78,8 @@ class Booking {
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':bus_id', $bus_id, PDO::PARAM_INT);
             $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
+            $seats = $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
+            return array_map('strval', $seats); // Ensure seats are strings
         } catch (PDOException $e) {
             error_log("Database error in getOccupiedSeats: " . $e->getMessage());
             throw new Exception("Failed to fetch occupied seats: " . $e->getMessage());
@@ -93,7 +94,6 @@ class Booking {
                       id_upload_path, reference, remarks, status)
                      VALUES (:passenger_id, :bus_id, :reserve_name, :passenger_type, :seat_number,
                             :id_upload_path, :reference, :remarks, :status)";
-
             $stmt = $this->conn->prepare($query);
             $params = [
                 ':passenger_id' => $passenger_id,
@@ -106,30 +106,23 @@ class Booking {
                 ':remarks' => $remarks,
                 ':status' => $status
             ];
-            
-            // Begin transaction
             $this->conn->beginTransaction();
-            
-            // Create booking
             $result = $stmt->execute($params);
-            
             if ($result) {
-                // Update available seats in bus table
                 $updateQuery = "UPDATE bus SET available_seats = available_seats - 1 WHERE bus_id = :bus_id AND available_seats > 0";
                 $updateStmt = $this->conn->prepare($updateQuery);
                 $updateStmt->bindParam(':bus_id', $bus_id, PDO::PARAM_INT);
                 $updateResult = $updateStmt->execute();
-                
                 if ($updateResult) {
                     $this->conn->commit();
                     return $this->conn->lastInsertId();
                 } else {
                     $this->conn->rollBack();
-                    return false;
+                    throw new Exception("Failed to update bus seats");
                 }
             } else {
                 $this->conn->rollBack();
-                return false;
+                throw new Exception("Failed to insert booking");
             }
         } catch (PDOException $e) {
             $this->conn->rollBack();
@@ -153,35 +146,41 @@ class Booking {
         }
     }
 
+    public function updateBookingStatusByReference($reference, $status) {
+        try {
+            $query = "UPDATE " . $this->table . " SET status = :status WHERE reference = :reference";
+            $stmt = $this->conn->prepare($query);
+            $params = [
+                ':status' => $status,
+                ':reference' => $reference
+            ];
+            return $stmt->execute($params);
+        } catch (PDOException $e) {
+            error_log("Database error in updateBookingStatusByReference: " . $e->getMessage());
+            throw new Exception("Failed to update booking status: " . $e->getMessage());
+        }
+    }
+
     public function deleteBooking($id) {
         try {
-            // First, get the booking details to update bus available seats
             $getBookingQuery = "SELECT bus_id, status FROM " . $this->table . " WHERE booking_id = :id";
             $getStmt = $this->conn->prepare($getBookingQuery);
             $getStmt->bindParam(':id', $id, PDO::PARAM_INT);
             $getStmt->execute();
             $booking = $getStmt->fetch(PDO::FETCH_ASSOC);
-            
             if (!$booking) {
                 return false;
             }
-            
-            // Begin transaction
             $this->conn->beginTransaction();
-            
-            // Delete the booking
             $query = "DELETE FROM " . $this->table . " WHERE booking_id = :id";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':id', $id, PDO::PARAM_INT);
             $result = $stmt->execute();
-            
-            // If booking was not cancelled, update the available seats
             if ($result && $booking['status'] !== 'cancelled') {
                 $updateQuery = "UPDATE bus SET available_seats = available_seats + 1 WHERE bus_id = :bus_id";
                 $updateStmt = $this->conn->prepare($updateQuery);
                 $updateStmt->bindParam(':bus_id', $booking['bus_id'], PDO::PARAM_INT);
                 $updateResult = $updateStmt->execute();
-                
                 if ($updateResult) {
                     $this->conn->commit();
                     return true;
@@ -199,26 +198,20 @@ class Booking {
             throw new Exception("Failed to delete booking: " . $e->getMessage());
         }
     }
-    
+
     public function generateReference() {
-        // Generate a unique reference number (alphanumeric, 10 characters)
         $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $reference = '';
         for ($i = 0; $i < 10; $i++) {
             $reference .= $characters[rand(0, strlen($characters) - 1)];
         }
-        
-        // Check if the reference already exists
         $query = "SELECT COUNT(*) FROM " . $this->table . " WHERE reference = :reference";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':reference', $reference);
         $stmt->execute();
-        
         if ($stmt->fetchColumn() > 0) {
-            // If reference already exists, generate a new one recursively
             return $this->generateReference();
         }
-        
         return $reference;
     }
 }
