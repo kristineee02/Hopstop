@@ -25,12 +25,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const seatNumberInput = document.getElementById('seat-number');
     const ticketForm = document.getElementById('ticket-form');
 
+    // Log element presence for debugging
+    console.log('Seat modal:', !!seatModal);
+    console.log('Close seat modal:', !!closeSeatModal);
+    console.log('Select seat button:', !!selectSeatBtn);
+    console.log('Seat number input:', !!seatNumberInput);
+    console.log('Ticket form:', !!ticketForm);
+
     // Get URL parameters
     const urlParams = new URLSearchParams(window.location.search);
-    console.log('URL Parameters:', Object.fromEntries(urlParams)); // Debug all parameters
-    let busId = urlParams.get('bus_id') || urlParams.get('id'); // Fallback to 'id'
+    console.log('URL Parameters:', Object.fromEntries(urlParams));
+    let busId = urlParams.get('bus_id') || urlParams.get('id');
 
-    // Require bus_id; show error if missing
+    // Require bus_id; redirect if missing
     if (!busId) {
         console.error('No bus_id or id parameter found in URL:', window.location.href);
         alert('No bus selected. Please choose a bus.');
@@ -62,15 +69,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Seat selection button
     if (selectSeatBtn) {
-        selectSeatBtn.addEventListener('click', () => getAvailableSeats(busId));
+        selectSeatBtn.addEventListener('click', () => {
+            console.log('Select seat button clicked');
+            openSeatModal(busId);
+        });
     } else {
-        console.warn('Select seat button not found');
+        console.error('Select seat button not found; cannot attach event listener');
     }
 
     // Close seat modal
     if (closeSeatModal && seatModal) {
         closeSeatModal.addEventListener('click', () => {
-            seatModal.style.display = 'none';
+            console.log('Closing seat modal');
+            seatModal.classList.remove('show');
         });
     } else {
         console.warn('Close seat modal or modal not found');
@@ -78,12 +89,135 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Hide seat modal initially
     if (seatModal) {
-        seatModal.style.display = 'none';
+        seatModal.classList.remove('show');
+        console.log('Seat modal hidden initially');
+    } else {
+        console.error('Seat modal not found');
     }
 
     // Fetch bus details
     getBusDetails(busId);
 });
+
+function openSeatModal(busId) {
+    console.log('Opening seat modal for bus ID:', busId);
+    const seatModal = document.getElementById('seat-modal');
+    const seatMap = document.getElementById('seat-map');
+    if (!seatModal || !seatMap) {
+        console.error('Seat modal or seat map not found');
+        alert('Error: Seat selection interface not found.');
+        return;
+    }
+
+    // Show modal and display loading message
+    seatModal.classList.add('show');
+    console.log('Set seat modal to show');
+    seatMap.innerHTML = '<p>Loading seats...</p>';
+
+    // Fetch available seats
+    fetch(`../api/booking_api.php?bus_id=${busId}`)
+        .then(response => {
+            console.log('Seat API Response status:', response.status);
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Seat API Response:', data);
+            if (data.success) {
+                createSeatGrid(seatMap, data.available_seats || []);
+            } else {
+                seatMap.innerHTML = '<p>Error fetching seats.</p>';
+                alert(data.message || 'Error fetching seats');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching seats:', error);
+            seatMap.innerHTML = '<p>Failed to load seat data.</p>';
+            alert('Failed to fetch seat data. Please try again.');
+        });
+}
+
+function createSeatGrid(seatMap, availableSeats) {
+    console.log('Creating seat grid with available seats:', availableSeats);
+    seatMap.innerHTML = '';
+
+    // Define seat layout: 3 columns (A, B, C) x 10 rows = 30 seats
+    const totalRows = 10;
+    const columns = ['A', 'B', 'C'];
+    const allSeats = [];
+    for (let row = 1; row <= totalRows; row++) {
+        for (let col of columns) {
+            allSeats.push(`${row}${col}`);
+        }
+    }
+
+    // Create grid container
+    const grid = document.createElement('div');
+    grid.style.display = 'grid';
+    grid.style.gridTemplateColumns = 'repeat(4, 50px)';
+    grid.style.gap = '5px';
+    grid.style.padding = '10px';
+    grid.style.justifyContent = 'center';
+
+    // Add column labels
+    grid.innerHTML = `
+        <span style="text-align: center; font-weight: bold;"></span>
+        <span style="text-align: center; font-weight: bold;">A</span>
+        <span style="text-align: center; font-weight: bold;">B</span>
+        <span style="text-align: center; font-weight: bold;">C</span>
+    `;
+
+    // Generate seat buttons
+    let seatIndex = 0;
+    for (let row = 1; row <= totalRows; row++) {
+        // Add row number
+        const rowLabel = document.createElement('span');
+        rowLabel.textContent = row;
+        rowLabel.style.textAlign = 'center';
+        rowLabel.style.fontWeight = 'bold';
+        grid.appendChild(rowLabel);
+
+        // Add seats for each column
+        for (let col of columns) {
+            const seatId = allSeats[seatIndex];
+            const isAvailable = availableSeats.includes(seatId);
+            const seatBtn = document.createElement('button');
+            seatBtn.type = 'button';
+            seatBtn.textContent = seatId;
+            seatBtn.classList.add('seat-button');
+            if (isAvailable) {
+                seatBtn.style.backgroundColor = '#4caf50';
+                seatBtn.style.cursor = 'pointer';
+                seatBtn.addEventListener('click', () => {
+                    const seatInput = document.getElementById('seat-number');
+                    if (seatInput) {
+                        seatInput.value = seatId;
+                        console.log(`Selected seat: ${seatId}`);
+                    } else {
+                        console.warn('Seat number input not found');
+                    }
+                    const seatModal = document.getElementById('seat-modal');
+                    if (seatModal) {
+                        seatModal.classList.remove('show');
+                        console.log('Closed seat modal after selection');
+                    }
+                });
+            } else {
+                seatBtn.style.backgroundColor = '#ccc';
+                seatBtn.style.cursor = 'not-allowed';
+                seatBtn.disabled = true;
+            }
+            grid.appendChild(seatBtn);
+            seatIndex++;
+        }
+    }
+
+    seatMap.appendChild(grid);
+
+    if (availableSeats.length === 0) {
+        seatMap.innerHTML = '<p>No seats available for this bus.</p>';
+    }
+}
 
 function getBusDetails(busId) {
     console.log("Fetching bus details for ID:", busId);
@@ -127,19 +261,17 @@ function displayBusDetails(bus) {
         return;
     }
 
-    // Update auto-generated spans in order: Bus ID, From, To, Departure, Arrival
     const spans = tripInfoContainer.querySelectorAll('.auto-generated');
     if (spans.length >= 5) {
-        spans[0].textContent = bus.bus_number || 'N/A'; // Bus ID
-        spans[1].textContent = bus.location || 'N/A'; // From
-        spans[2].textContent = bus.destination || 'N/A'; // To
-        spans[3].textContent = formatTime(bus.departure_time) || 'N/A'; // Departure
-        spans[4].textContent = formatTime(bus.arrival_time) || 'N/A'; // Arrival
+        spans[0].textContent = bus.bus_number || 'N/A';
+        spans[1].textContent = bus.location || 'N/A';
+        spans[2].textContent = bus.destination || 'N/A';
+        spans[3].textContent = formatTime(bus.departure_time) || 'N/A';
+        spans[4].textContent = formatTime(bus.arrival_time) || 'N/A';
     } else {
         console.error("Not enough auto-generated spans found");
     }
 
-    // Set base price
     const price = parseFloat(bus.price) || 0;
     const basePriceElement = document.getElementById('basePrice');
     if (basePriceElement) {
@@ -149,62 +281,7 @@ function displayBusDetails(bus) {
         console.warn('Base price element not found');
     }
 
-    // Initialize price calculations
     calculatePrice();
-}
-
-function getAvailableSeats(busId) {
-    console.log("Fetching available seats for bus ID:", busId);
-    fetch(`../api/booking_api.php?bus_id=${busId}`)
-        .then(response => {
-            console.log("Seat API Response status:", response.status);
-            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-            return response.json();
-        })
-        .then(data => {
-            console.log("Seat API Response:", data);
-            const seatMap = document.getElementById('seat-map');
-            if (!seatMap) {
-                console.error('Seat map not found');
-                return;
-            }
-            seatMap.innerHTML = '';
-            if (data.success && data.available_seats) {
-                if (data.available_seats.length === 0) {
-                    seatMap.textContent = "No seats available.";
-                } else {
-                    data.available_seats.forEach(seat => {
-                        const seatBtn = document.createElement('button');
-                        seatBtn.type = 'button';
-                        seatBtn.textContent = seat;
-                        seatBtn.classList.add('seat-button');
-                        seatBtn.addEventListener('click', () => {
-                            const seatInput = document.getElementById('seat-number');
-                            if (seatInput) {
-                                seatInput.value = seat;
-                            } else {
-                                console.warn('Seat number input not found');
-                            }
-                            const modal = document.getElementById('seat-modal');
-                            if (modal) {
-                                modal.style.display = 'none';
-                            }
-                        });
-                        seatMap.appendChild(seatBtn);
-                    });
-                }
-                const modal = document.getElementById('seat-modal');
-                if (modal) {
-                    modal.style.display = 'flex';
-                }
-            } else {
-                alert(data.message || 'Error fetching seats');
-            }
-        })
-        .catch(error => {
-            console.error("Error fetching seats:", error);
-            alert('Failed to fetch seat data.');
-        });
 }
 
 function formatTime(timeString) {
@@ -288,7 +365,6 @@ function processBooking() {
         return;
     }
 
-    // Fetch passenger_id from session
     fetch('../api/store_session.php')
         .then(response => response.json())
         .then(data => {

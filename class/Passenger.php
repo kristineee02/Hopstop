@@ -86,4 +86,16 @@ class Passenger{
             throw new Exception("SQL Error: " . implode(", ", $stmt->errorInfo()));
         }
     }
+
+    public function deletePassenger($passengerId) {
+        $query = "DELETE FROM passenger WHERE passenger_id = :id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $passengerId, PDO::PARAM_INT);
+
+        if ($stmt->execute()) {
+            return $stmt->rowCount() > 0;
+        } else {
+            return false;
+        }
+    }
 }

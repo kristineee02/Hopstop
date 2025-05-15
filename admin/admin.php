@@ -59,14 +59,52 @@
             background-color: #f44336;
             color: white;
         }
+         /* HEADER STYLES */
+    .main-header {
+        background-color: #a682c1; /* Restored original purple color */
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 30px;
+        width: 100%;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .logo {
+        font-size: 24px;
+        font-weight: bold;
+        color: white;
+    }
+
+    .nav-menu {
+        display: flex;
+        gap: 25px;
+    }
+
+    .nav-menu a {
+        color: white;
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: 500;
+        padding: 5px 10px;
+    }
+
+    .nav-menu a:hover {
+        text-decoration: underline;
+    }
+
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="navbar">
-            <div class="logo">HopStop Admin</div>
-        </div>
-    </div>
+<header class="main-header">
+        <div class="logo">Admin HopStop</div>
+        <nav class="nav-menu">
+            <a href="admin.php">Bus Management</a>
+            <a href="#">Booking Management</a>
+            <a href="passenger_list.php">Passenger Records</a>
+            <a href="#">Logout</a>
+        </nav>
+    </header>
 
     <div class="container">
         <div class="table-container">

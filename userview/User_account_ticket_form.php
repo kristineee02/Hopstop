@@ -7,122 +7,59 @@
     <script src="../js/Userlogout.js"></script>
     <script src="https://kit.fontawesome.com/yourcode.js" crossorigin="anonymous"></script>
     <title>HopStop - Ticket Form</title>
-    <style>
+     <style>
 .modal {
-  position: fixed;
-  z-index: 1000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0,0,0,0.5); 
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
 }
-
+.modal.show {
+    display: flex !important;
+}
 .modal-content {
-  background-color: #fff;
-  padding: 20px 30px;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 400px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-  position: relative;
+    background-color: #fff;
+    padding: 20px 30px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 350px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    position: relative;
 }
-
-.close {
-  position: absolute;
-  top: 12px;
-  right: 15px;
-  font-size: 24px;
-  font-weight: bold;
-  color: #555;
-  cursor: pointer;
-}
-
-.close:hover {
-  color: #000;
-}
-
-#seat-map {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 15px;
-  max-height: 300px;
-  overflow-y: auto;
-  justify-content: center;
-}
-
 .seat-button {
-  background-color: #4caf50;
-  border: none;
-  color: white;
-  padding: 12px 16px;
-  font-size: 16px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  min-width: 45px;
-  text-align: center;
-  user-select: none;
+    background-color: #4caf50;
+    border: none;
+    color: white;
+    padding: 8px;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    width: 50px;
+    height: 40px;
+    text-align: center;
 }
-
-.seat-button:hover {
-  background-color: #45a049;
+.seat-button:hover:not(:disabled) {
+    background-color: #45a049;
 }
-
-#ticket-form-section {
-  max-width: 500px;
-  margin: 20px auto;
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: #fafafa;
+.seat-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
 }
-
-#ticket-form div {
-  margin-bottom: 15px;
+#seat-map {
+    display: flex;
+    justify-content: center;
+    max-width: 250px;
+    margin: 0 auto;
 }
-
-#ticket-form label {
-  display: block;
-  margin-bottom: 6px;
-  font-weight: 600;
-  color: #333;
-}
-
-#ticket-form input[type="text"],
-#ticket-form select,
-#ticket-form textarea,
-#ticket-form input[type="file"] {
-  width: 100%;
-  padding: 8px 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 14px;
-  box-sizing: border-box;
-}
-
-#ticket-form button[type="submit"],
-#select-seat-btn {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  font-size: 16px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.25s ease;
-}
-
-#ticket-form button[type="submit"]:hover,
-#select-seat-btn:hover {
-  background-color: #0056b3;
-}
-</style>
+</style> 
 
 </head>
 <body>
@@ -195,13 +132,10 @@
         </div>
     </div>
     
-       <!-- Seat selection modal -->
-       <div id="seat-modal">
-      <div class="modal-content">
-        <span class="close" id="close-seat-modal">&times;</span>
-        <h3>Select a Seat</h3>
-        <div id="seat-map"></div>
-      </div>
+    <div class="form-group">
+                <label for="seat-number">Seat Number:</label>
+                <input type="text" id="seat-number" name="seatNumber" readonly>
+                <button type="button" id="select-seat-btn">Select Seat</button>
     </div>
 
     <!-- Trip Information -->
@@ -266,6 +200,14 @@
     <div class="action-buttons">
         <button type="button" class="print-button" onclick="processBooking()">Confirm & Print Ticket</button>
         <button type="button" class="cancel-button" onclick="cancelBooking()">Cancel</button>
+    </div>
+
+    <!-- Seat selection modal -->
+<div id="seat-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close" id="close-seat-modal">×</span>
+        <h3>Select a Seat</h3>
+        <div id="seat-map"></div>
     </div>
 </div>
 
@@ -336,6 +278,8 @@
     </script>
 
 <script src="../js/ticket_form.js"></script>
+
+
 
 
 </body>

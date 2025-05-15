@@ -105,5 +105,32 @@ switch ($method) {
             "message" => "Invalid request method"
         ]);
         break;
+
+    case 'DELETE':
+        $delData = file_get_contents("php://input");
+        $data = json_decode($delData, true);
+
+        if (!isset($data["PassengerId"]) || empty($data["PassengerId"])) {
+            http_response_code(400);
+            echo json_encode([
+                "status" => "error",
+                "message" => "PassengerId is required"
+            ]);
+            exit;
+        }
+
+        try {
+            $result = $passenger->deletePassenger($data["PassengerId"]);
+            if ($result) {
+                echo json_encode(["status" => "success", "message" => "Passenger deleted successfully"]);
+            } else {
+                http_response_code(404);
+                echo json_encode(["status" => "error", "message" => "Passenger not found"]);
+            }
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode(["status" => "error", "message" => $e->getMessage()]);
+        }
+        break;
 }
 ?>
