@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../style/Contactpage.css">
+    <link rel="stylesheet" href="../style/contact.css">
     <title>HopStop</title>
     <style>
     .social-icons a {
@@ -18,21 +18,29 @@
     
 </head>
 <body>
-    <header>
-        <div class="container nav-container">
-            <div class="logo">
-                <div class="logo-circle"></div>
-                <span><B>HopStop</B></span>
-            </div>
-            <nav>
-                <ul class="nav-links">
-                    <li><a href="User.php">Home</a></li>
-                    <li><a href="About.php">About</a></li>
-                    <li><a href="Contact.php">Contact</a></li>
-                </ul>
-            </nav>
-            <button class="login-btn" onclick="login()">Log In</button>
-        </div>
+<header>
+      <div class="container nav-container">
+          <div class="logo">
+              <div class="logo-circle"></div>
+              <span><b>HopStop</b></span>
+          </div>
+          <nav>
+              <ul class="nav-links">
+                  <li><a href="User.php">Home</a></li>
+                  <li><a href="About.php">About</a></li>
+                  <li><a href="Contact.php">Contact</a></li>
+                  </ul>
+          </nav>
+         
+          <div class="user-profile" id="profileButton">
+              <i class ="fas fa-user-circle"></i>
+          </div>
+         
+          <div class="profile-dropdown" id="profileDropdown">
+              <div class="dropdown-item">Profile</div>
+              <div class="dropdown-item" onclick="logOut()">Logout</div>
+          </div>
+      </div>
     </header>
       
    
