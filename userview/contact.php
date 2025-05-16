@@ -89,7 +89,7 @@
                 </div>
                 <div class="social-icon">
                     <div class="icon-circle"></div>
-                    <a href="../kristine/portfolio/final.html"> Marian Talaid</a>
+                    <a href="../Marian/Marian/myPortfolio/index.html"> Marian Talaid</a>
                 </div>
                 <div class="social-icon">
                     <div class="icon-circle"></div>
