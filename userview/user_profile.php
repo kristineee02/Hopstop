@@ -7,6 +7,22 @@
     <title>HopStop Dashboard</title>
     <link rel="stylesheet" href="../style/user_prof.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+         th {
+        color: black;
+        text-align: left;
+        padding-right: 14px;
+        text-transform: uppercase;
+        font-size: 14px;
+    }
+
+    td {
+        padding-right: 12px;
+        border-bottom: 1px solid #eee;
+        font-size: 15px;
+    }
+    </style>
+
 </head>
 
 <body>
@@ -77,28 +93,36 @@
             <h2>Active Booking</h2>
             <section class="booking-section">
                 <div class="booking-scroll">
-                    <div class="booking-card">
-                        <nav>
-                            <a href="#">Bus No. </a>
-                            <a href="#">Location </a>
-                            <a href="#">Destination</a>
-                            <a href="#">Departure</a>
-                            <a href="#">Arrival</a>
-                            <a href="#">Seat No.</a>
-                        </nav>
+                     <div class="container">
+                        <div class="booking-card" id="booking-details">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Bus No.</th>
+                                        <th>Location</th>
+                                        <th>Destination</th>
+                                        <th>Departure</th>
+                                        <th>Arrival</th>
+                                        <th>Seat No.</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="content">
+                                    <!--js-->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </section>
             <div class="booking-buttons">
                 <button class="cancel-btn">Cancel Booking</button>
-                <button class="view-btn">View Ticket</button>
             </div>
        </section>
    </div>
    
-   <!-- Add script tags at the end of the body -->
    <script src="../js/user_script.js"></script>
 
+    
 </body>
 
 </html>

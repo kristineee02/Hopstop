@@ -196,3 +196,271 @@ function updateProfile() {
             alert("Error updating profile: " + error.message);
         });
 }
+
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    // Check if user is logged in
+    checkUserSession();
+    
+    // Load active bookings
+    loadActiveBookings();
+    
+    // Set up event listeners for booking actions
+    setupBookingButtons();
+    
+    // Check URL parameters for both booking_id and bus_id
+    const urlParams = new URLSearchParams(window.location.search);
+    const busId = urlParams.get('bus_id');
+    const bookingId = urlParams.get('booking_id') || urlParams.get('id');
+    
+    // Handle both types of parameters
+    if (busId) {
+        getBusById(busId);
+    } else if (bookingId) {
+        // Get booking details by ID
+        getBookingById(bookingId);
+    }
+});
+
+function checkUserSession() {
+    fetch("../api/store_session.php")
+        .then(response => response.json())
+        .then(data => {
+            if (!data.userId) {
+                window.location.href = "login.php";
+                return;
+            }
+            // Update user profile information
+            if (data.firstName && data.lastName) {
+                document.getElementById("nameDisplay2").textContent = data.firstName + " " + data.lastName;
+            }
+            if (data.email) {
+                document.getElementById("userEmail").textContent = data.email;
+            }
+            if (data.profilePicture) {
+                document.getElementById("imageDisplay2").src = data.profilePicture;
+            }
+        })
+        .catch(error => console.error("Session check error:", error));
+}
+
+function loadActiveBookings() {
+    fetch("../api/store_session.php")
+        .then(response => response.json())
+        .then(data => {
+            if (!data.userId) {
+                console.error("User not authenticated");
+                window.location.href = "login.php";
+                return;
+            }
+            
+            // Fetch active and pending bookings
+            return fetch(`../api/booking_api.php?user_id=${data.userId}&status=active,pending`);
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Booking API response:", data); // Debug: Log the response
+            if (data.status === "success") {
+                displayActiveBookings(data.bookings);
+            } else {
+                console.error("Error fetching bookings:", data.message);
+                const bookingTable = document.getElementById("content");
+                if (bookingTable) {
+                    bookingTable.innerHTML = `
+                        <tr>
+                            <td colspan="6" style="text-align: center;">No active or pending bookings found.</td>
+                        </tr>
+                    `;
+                }
+                // Disable action buttons
+                const cancelBtn = document.querySelector(".cancel-btn");
+                const viewBtn = document.querySelector(".view-btn");
+                if (cancelBtn) cancelBtn.disabled = true;
+                if (viewBtn) viewBtn.disabled = true;
+            }
+        })
+        .catch(error => {
+            console.error("Error fetching bookings:", error);
+            const bookingTable = document.getElementById("content");
+            if (bookingTable) {
+                bookingTable.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center;">Error loading bookings.</td>
+                    </tr>
+                `;
+            }
+        });
+}
+
+function displayActiveBookings(bookings) {
+    const bookingTable = document.getElementById("content");
+    
+    if (!bookingTable) {
+        console.error("Booking table content element not found!");
+        return;
+    }
+    
+    // Clear existing content
+    bookingTable.innerHTML = '';
+    
+    if (!bookings || bookings.length === 0) {
+        bookingTable.innerHTML = `
+            <tr>
+                <td colspan="6" style="text-align: center;">No active or pending bookings found.</td>
+            </tr>
+        `;
+        // Disable action buttons
+        const cancelBtn = document.querySelector(".cancel-btn");
+        const viewBtn = document.querySelector(".view-btn");
+        if (cancelBtn) cancelBtn.disabled = true;
+        if (viewBtn) viewBtn.disabled = true;
+        return;
+    }
+    
+    // Enable action buttons
+    const cancelBtn = document.querySelector(".cancel-btn");
+    const viewBtn = document.querySelector(".view-btn");
+    if (cancelBtn) cancelBtn.disabled = false;
+    if (viewBtn) viewBtn.disabled = false;
+    
+    // Populate table with bookings
+    bookings.forEach(booking => {
+        const bookingRow = document.createElement("tr");
+        bookingRow.className = "booking-item";
+        bookingRow.dataset.bookingId = booking.booking_id;
+        bookingRow.dataset.busId = booking.bus_id;
+        
+        bookingRow.innerHTML = `
+            <td>${booking.bus_number || 'N/A'}</td>
+            <td>${booking.location || 'N/A'}</td>
+            <td>${booking.destination || 'N/A'}</td>
+            <td>${booking.departure_time || 'N/A'}</td>
+            <td>${booking.arrival_time || 'N/A'}</td>
+            <td>${booking.seat_number || 'N/A'}</td>
+        `;
+        
+        bookingTable.appendChild(bookingRow);
+        
+        // Add click handler to select booking
+        bookingRow.addEventListener("click", function() {
+            document.querySelectorAll(".booking-item").forEach(row => {
+                row.classList.remove("selected");
+            });
+            this.classList.add("selected");
+        });
+    });
+    
+    // Auto-select the first booking
+    const firstBooking = document.querySelector(".booking-item");
+    if (firstBooking) {
+        firstBooking.classList.add("selected");
+    }
+}
+
+function getBusById(id) {
+    console.log(`Fetching bus with ID: ${id}`);
+    fetch(`../api/bus_api.php?id=${id}`)
+        .then(response => {
+            console.log("API Response status:", response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log("API Response data:", data);
+            if (data.status === "success" && data.bus) {
+                console.log("Bus booked successfully:", data.bus);
+                // Show success message
+                alert(`Bus booking successful! You've booked a seat on bus ${data.bus.bus_number} from ${data.bus.location} to ${data.bus.destination}.`);
+                // Refresh the active bookings to show the new booking
+                loadActiveBookings();
+            } else {
+                console.error("Error fetching bus:", data.message);
+                alert("Failed to confirm booking details. Please check your active bookings.");
+            }
+        })
+        .catch(error => {
+            console.error("Error fetching bus:", error);
+            alert("Failed to load bus data. Please try again later.");
+        });
+}
+function getBookingById(id) {
+    console.log(`Fetching booking with ID: ${id}`);
+    fetch(`../api/booking_api.php?booking_id=${id}`)
+        .then(response => {
+            console.log("API Response status:", response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log("API Response data:", data);
+            if (data.status === "success" && data.booking) {
+                console.log("Booking details:", data.booking);
+                displayBookingDetails(data.booking);
+            } 
+        })
+        .catch(error => {
+            console.error("Error fetching booking:", error);
+            alert("Failed to load booking data. Please check your active bookings.");
+        });
+}
+
+function displayBookingDetails(booking) {
+    const bookingDetailsContainer = document.getElementById("booking-details");
+    if (!bookingDetailsContainer) {
+        console.error("Booking details container not found!");
+        return;
+    }
+
+    bookingDetailsContainer.innerHTML = `
+        <h3>Booking Details</h3>
+        <p><strong>Bus Number:</strong> ${booking.bus_number || 'N/A'}</p>
+        <p><strong>From:</strong> ${booking.location || 'N/A'}</p>
+        <p><strong>To:</strong> ${booking.destination || 'N/A'}</p>
+        <p><strong>Departure:</strong> ${formatTime(booking.departure_time) || 'N/A'}</p>
+        <p><strong>Arrival:</strong> ${formatTime(booking.arrival_time) || 'N/A'}</p>
+        <p><strong>Seat Number:</strong> ${booking.seat_number || 'N/A'}</p>
+        <p><strong>Reference:</strong> ${booking.reference || 'N/A'}</p>
+    `;
+}
+
+function setupBookingButtons() {
+    // Cancel booking button
+    const cancelBtn = document.querySelector(".cancel-btn");
+    if (cancelBtn) {
+        cancelBtn.addEventListener("click", function() {
+            const selectedBooking = document.querySelector(".booking-item.selected");
+            
+            if (!selectedBooking) {
+                alert("Please select a booking to cancel.");
+                return;
+            }
+            
+            const bookingId = selectedBooking.dataset.bookingId;
+            
+            if (confirm("Are you sure you want to cancel this booking?")) {
+                cancelBooking(bookingId);
+            }
+        });
+    }
+    
+}
+
+function cancelBooking(bookingId) {
+    fetch("../api/booking_api.php", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ booking_id: Number(bookingId) })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === "success") {
+            alert("Booking cancelled successfully!");
+            loadActiveBookings(); 
+        } else {
+            alert("Failed to cancel booking: " + data.message);
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("An error occurred while cancelling the booking.");
+    });
+}

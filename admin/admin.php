@@ -122,7 +122,7 @@ $connectionStatus = $test->checkConnection();
             <select id="filterBusType" onchange="filterBus()">
                 <option value="">Filter By Bus Type</option>
                 <option value="Air-Conditioned">Air-Conditioned</option>
-                <option value="Non Air-Conditioned">Non Air-Conditioned</option>
+                <option value="Regular">Regular</option>
             </select>
         </div>
         <table>
@@ -183,7 +183,7 @@ $connectionStatus = $test->checkConnection();
             <div class="form-group">
                 <select id="busType">
                     <option value="Air-Conditioned">Air-Conditioned</option>
-                    <option value="Non Air-Conditioned">Non Air-Conditioned</option>
+                    <option value="regular">regular</option>
                 </select>
                 <input type="number" id="price" placeholder="Price">
                 <input type="number" id="availableSeats" placeholder="Available Seats">

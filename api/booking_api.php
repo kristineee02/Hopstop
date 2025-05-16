@@ -39,6 +39,30 @@ switch ($method) {
             }
             exit;
         }
+        if (isset($_GET['user_id']) && isset($_GET['status'])) {
+            $user_id = $_GET['user_id'];
+            $statuses = explode(',', $_GET['status']);
+            try {
+                $placeholders = implode(',', array_fill(0, count($statuses), '?'));
+                $query = "SELECT b.booking_id, b.bus_id, b.seat_number, b.status, b.reference,
+                                 bs.bus_number, bs.location, bs.destination, bs.departure_time, bs.arrival_time
+                          FROM bookings b
+                          LEFT JOIN bus bs ON b.bus_id = bs.bus_id
+                          WHERE b.passenger_id = ? AND b.status IN ($placeholders)";
+                $stmt = $db->prepare($query);
+                $stmt->bindValue(1, $user_id, PDO::PARAM_INT);
+                foreach ($statuses as $index => $status) {
+                    $stmt->bindValue($index + 2, trim($status), PDO::PARAM_STR);
+                }
+                $stmt->execute();
+                $bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                echo json_encode(["status" => "success", "bookings" => $bookings]);
+            } catch (Exception $e) {
+                http_response_code(500);
+                echo json_encode(["status" => "error", "message" => $e->getMessage()]);
+            }
+            exit;
+        }
         if (isset($_GET['bus_id'])) {
             $bus_id = $_GET['bus_id'];
             try {
@@ -72,8 +96,8 @@ switch ($method) {
             }
             exit;
         }
-        if (isset($_GET['id'])) {
-            $id = $_GET['id'];
+        if (isset($_GET['id']) || isset($_GET['booking_id'])) {
+            $id = $_GET['id'] ?? $_GET['booking_id'];
             try {
                 $bookingData = $booking->getBookingById($id);
                 if ($bookingData) {
@@ -112,7 +136,6 @@ switch ($method) {
         }
 
         try {
-            // Check if seat is already taken
             $occupiedSeats = $booking->getOccupiedSeats($bus_id);
             if (in_array($seat_number, $occupiedSeats)) {
                 http_response_code(409);
@@ -120,7 +143,6 @@ switch ($method) {
                 exit;
             }
 
-            // Verify bus exists and has available seats
             $busData = $bus->getBusById($bus_id);
             if (!$busData) {
                 http_response_code(404);
@@ -160,7 +182,7 @@ switch ($method) {
                 $id_upload_path,
                 $reference,
                 $remarks,
-                'pending'
+                'pending' 
             );
 
             if ($booking_id) {
@@ -203,12 +225,14 @@ switch ($method) {
         exit;
 
     case 'DELETE':
-        if (!isset($_GET['id'])) {
+        $inputJSON = file_get_contents('php://input');
+        $inputData = json_decode($inputJSON, true);
+        if (!$inputData || !isset($inputData['booking_id'])) {
             http_response_code(400);
             echo json_encode(["status" => "error", "message" => "Booking ID is required for deletion"]);
             exit;
         }
-        $id = $_GET['id'];
+        $id = $inputData['booking_id'];
         try {
             $result = $booking->deleteBooking($id);
             if ($result) {

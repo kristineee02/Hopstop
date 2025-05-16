@@ -120,7 +120,6 @@ function calculatePrice() {
         totalPriceElement.textContent = 'PHP ' + totalPrice.toFixed(2);
     }
 }
-
 function processBooking() {
     const name = document.getElementById('name')?.value;
     const selectedSeat = document.getElementById('seat-number')?.value;
@@ -187,7 +186,8 @@ function createNewBooking(passengerId, busId, name, passengerType, selectedSeat,
             console.log('Booking API response data:', data);
             if (data.status === 'success' && data.booking_id && data.reference) {
                 alert('Booking successful! Reference: ' + data.reference);
-                window.location.href = `user_profile.php?id=${data.booking_id}`;
+                // Pass the booking_id in the URL
+                window.location.href = `user_profile.php?booking_id=${data.booking_id}`;
             } else {
                 throw new Error(data.message || 'Invalid response from server');
             }
@@ -196,10 +196,4 @@ function createNewBooking(passengerId, busId, name, passengerType, selectedSeat,
             console.error('Error creating booking:', error);
             alert('Failed to create booking: ' + error.message);
         });
-}
-
-function cancelBooking() {
-    if (confirm('Are you sure you want to cancel this booking?')) {
-        window.location.href = 'User.php';
-    }
 }
