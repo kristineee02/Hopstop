@@ -9,8 +9,8 @@ class Booking {
 
     public function getAllBookingDetails() {
         try {
-            $query = "SELECT b.booking_id, b.passenger_id, b.bus_id, b.reserve_name, b.passenger_type, 
-                             b.seat_number, b.id_upload, b.reference, b.remarks, b.status,
+            $query = "SELECT b.booking_id, b.passenger_id, b.bus_id, b.passenger_type, 
+                             b.seat_number,b.reference, b.status,
                              bs.price
                       FROM " . $this->table . " b
                       LEFT JOIN bus bs ON b.bus_id = bs.bus_id

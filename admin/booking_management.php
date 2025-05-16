@@ -130,6 +130,8 @@ $connectionStatus = $test->checkConnection();
                 <option value="PWD/Senior Citizen">PWD/Senior Citizen</option>
                 <option value="Student">Student</option>
             </select>
+            <input type="text" id="search-reference" placeholder="Search By Reference">
+
         </div>
         <table>
             <thead>

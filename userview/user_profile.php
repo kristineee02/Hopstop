@@ -118,7 +118,7 @@
                 <button class="cancel-btn">Cancel Booking</button>
             </div>
 
-            <!-- <div class="booking-header">
+            <div class="booking-header">
                 <h2>Booking History</h2>
 
                 <div class="button">
@@ -141,7 +141,7 @@
                             </div>
                         </div>
                     </section>
-                </div> -->
+                </div>
 
        </section>
    </div>
