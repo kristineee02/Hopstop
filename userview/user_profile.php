@@ -119,29 +119,36 @@
             </div>
 
             <div class="booking-header">
-                <h2>Booking History</h2>
-
-                <div class="button">
-                    <button class="arrow-button" onclick="toggleDropdown1()">
-                            <img src="../images/free-arrow-down-icon-3101-thumb.png" alt="arrow">
-                        </button>
+    <h2>Booking History</h2>
+    <div class="button">
+        <button class="arrow-button" onclick="toggleDropdown1()">
+            <img src="../images/free-arrow-down-icon-3101-thumb.png" alt="arrow">
+        </button>
+    </div>
+    <div class="dropdown-menu1" id="dropdownMenu1">
+        <section class="booking-section-history">
+            <div class="booking-scroll">
+                <div class="booking-card-history">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Bus No.</th>
+                                <th>Location</th>
+                                <th>Destination</th>
+                                <th>Departure</th>
+                                <th>Arrival</th>
+                                <th>Seat No.</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bookingHistoryTableBody">
+                            <!-- js -->
+                    </tbody>
+                    </table>
                 </div>
-                <div class="dropdown-menu1" id="dropdownMenu1">
-                    <section class="booking-section-history">
-                        <div class="booking-scroll">
-                            <div class="booking-card-history">
-                                <nav>
-                                    <a href="#">Bus No. </a>
-                                    <a href="#">Location </a>
-                                    <a href="#">Destination</a>
-                                    <a href="#">Departure</a>
-                                    <a href="#">Arrival</a>
-                                    <a href="#">Seat No.</a>
-                                </nav>
-                            </div>
-                        </div>
-                    </section>
-                </div>
+            </div>
+        </section>
+    </div>
+</div>
 
        </section>
    </div>
