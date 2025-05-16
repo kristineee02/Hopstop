@@ -130,7 +130,6 @@ $connectionStatus = $test->checkConnection();
                 <option value="PWD/Senior Citizen">PWD/Senior Citizen</option>
                 <option value="Student">Student</option>
             </select>
-            <input type="text" id="search-reference" placeholder="Search By Reference">
         </div>
         <table>
             <thead>
@@ -144,41 +143,10 @@ $connectionStatus = $test->checkConnection();
             </thead>
             <tbody id="BookingTableBody"></tbody>
         </table>
+        <div id="booking-details"></div>
     </div>
 </div>
-<div id="editBookingModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeEditModal()">×</span>
-        <h3>Update Booking Details</h3>
-        <div class="form-grid">
-            <div class="form-group">
-                <label for="editReference">Reference</label>
-                <input type="text" id="editReference" readonly>
-                <label for="editPassengerType">Passenger Type</label>
-                <select id="editPassengerType">
-                    <option value="">Select Type</option>
-                    <option value="Regular">Regular</option>
-                    <option value="PWD/Senior Citizen">PWD/Senior Citizen</option>
-                    <option value="Student">Student</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="editSeatNumber">Seat Number</label>
-                <input type="number" id="editSeatNumber" placeholder="Seat Number">
-                <label for="editPrice">Price</label>
-                <input type="number" id="editPrice" placeholder="Price">
-            </div>
-            <div class="form-group">
-                <label for="editStatus">Status</label>
-                <select id="editStatus">
-                    <option value="pending">Pending</option>
-                    <option value="confirmed">Confirmed</option>
-                </select>
-            </div>
-        </div>
-        <button onclick="updateBooking()">Save Changes</button>
-    </div>
-</div>
+
 <script src="../js/booking.js"></script>
 </body>
 </html>

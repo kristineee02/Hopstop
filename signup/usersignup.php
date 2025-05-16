@@ -36,6 +36,8 @@
     position: relative;
     text-align: center;
     overflow: hidden;
+    background-image: url('../images/Homepage_image1.png'); 
+
 }
 
 .overlay {
@@ -67,7 +69,7 @@
     color: #222;
     font-weight: 700;
     font-size: 54px;
-    background-color: #FFE295;
+    background-color:rgb(255, 149, 255);
     padding: 8px 20px;
     margin-top: 5px;
     z-index: 2;
@@ -109,7 +111,7 @@
     transform: translateX(-50%);
     width: 50px;
     height: 3px;
-    background-color: #FFE295;
+    background-color:rgb(255, 149, 255);
 }
 
 .form {
@@ -160,14 +162,14 @@
     border: none;
     border-radius: 8px;
     margin: 15px 0;
-    background-color: #FFE295;
+    background-color:rgb(255, 149, 255);
     color: #333;
     transition: all 0.3s ease;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .form button:hover {
-    background-color: #ffd970;
+    background-color:rgb(191, 44, 211);
     transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
 }

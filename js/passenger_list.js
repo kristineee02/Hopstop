@@ -3,7 +3,6 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function getPassenger() {
-    // First, check if the user is authenticated by fetching session data
     fetch("../api/store_session.php")
         .then(response => response.json())
         .then(data => {
@@ -11,16 +10,14 @@ function getPassenger() {
                 console.error("User not authenticated");
                 return;
             }
-            // Fetch all passengers (no passengerId parameter to get all)
             return fetch("../api/passenger_api.php");
         })
         .then(response => response.json())
         .then(data => {
             if (data.status === "success") {
                 const content = document.getElementById("content");
-                content.innerHTML = ""; // Clear existing content
+                content.innerHTML = ""; 
 
-                // Iterate over the passengers array
                 data.passengers.forEach(passenger => {
                     content.innerHTML += `
                         <tr>

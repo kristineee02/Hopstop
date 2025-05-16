@@ -183,7 +183,7 @@ $connectionStatus = $test->checkConnection();
             <div class="form-group">
                 <select id="busType">
                     <option value="Air-Conditioned">Air-Conditioned</option>
-                    <option value="regular">regular</option>
+                    <option value="regular">Regular</option>
                 </select>
                 <input type="number" id="price" placeholder="Price">
                 <input type="number" id="availableSeats" placeholder="Available Seats">
@@ -201,6 +201,7 @@ $connectionStatus = $test->checkConnection();
         <div class="form">
             <input type="number" id="editBusId" placeholder="Bus Id" readonly>
             <input type="number" id="editNumber" placeholder="Bus Number">
+
             <select id="editStatus">
                 <option value="Available">Available</option>
                 <option value="Unavailable">Unavailable</option>
@@ -230,7 +231,7 @@ $connectionStatus = $test->checkConnection();
             <div class="form-group">
                 <select id="editbusType">
                     <option value="Air-Conditioned">Air-Conditioned</option>
-                    <option value="Non Air-Conditioned">Non Air-Conditioned</option>
+                    <option value="regular">Regular</option>
                 </select>
                 <input type="number" id="editprice" placeholder="Price">
                 <input type="number" id="editavailableSeats" placeholder="Available Seats">

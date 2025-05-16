@@ -37,8 +37,8 @@
                  <ul class="nav-links">
                      <li><a href="User.php">Home</a></li>
                      <li><a href="About.php">About</a></li>
-                     <li><a href="contact.php">Contact</a></li>
-                 </ul>
+                     <li><a href="Contact.php">Contact</a></li>
+                     </ul>
              </nav>
             
              <div class="user-profile" id="profileButton">
@@ -117,6 +117,32 @@
             <div class="booking-buttons">
                 <button class="cancel-btn">Cancel Booking</button>
             </div>
+
+            <!-- <div class="booking-header">
+                <h2>Booking History</h2>
+
+                <div class="button">
+                    <button class="arrow-button" onclick="toggleDropdown1()">
+                            <img src="../images/free-arrow-down-icon-3101-thumb.png" alt="arrow">
+                        </button>
+                </div>
+                <div class="dropdown-menu1" id="dropdownMenu1">
+                    <section class="booking-section-history">
+                        <div class="booking-scroll">
+                            <div class="booking-card-history">
+                                <nav>
+                                    <a href="#">Bus No. </a>
+                                    <a href="#">Location </a>
+                                    <a href="#">Destination</a>
+                                    <a href="#">Departure</a>
+                                    <a href="#">Arrival</a>
+                                    <a href="#">Seat No.</a>
+                                </nav>
+                            </div>
+                        </div>
+                    </section>
+                </div> -->
+
        </section>
    </div>
    

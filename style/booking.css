@@ -200,11 +200,11 @@ header {
     background-color: #c7a4f2;
     border: none;
     color: white;
-    padding: 8px 15px;
+    padding: 20px 15px;
     border-radius: 20px;
     cursor: pointer;
     font-weight: bold;
-    margin-left: 10px;
+    margin-left: 50px;
 }
 
 .book-button:hover {

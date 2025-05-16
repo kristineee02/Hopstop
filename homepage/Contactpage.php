@@ -7,6 +7,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../style/Contactpage.css">
     <title>HopStop</title>
+    <style>
+    .social-icons a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 600;
+}
+
+</style>
     
 </head>
 <body>
@@ -61,19 +69,27 @@
         </div>
 
         <div class="social-media">
-            <h3>Social Media</h3>
+            <h3>Developer's portfolio</h3>
             <div class="social-icons">
                 <div class="social-icon">
                     <div class="icon-circle"></div>
-                    <span>Facebook</span>
+                    <a href="../Kristine//final.html"> Kristine Sabuero</a>
                 </div>
                 <div class="social-icon">
                     <div class="icon-circle"></div>
-                    <span>Instagram</span>
+                    <a href="../kristine/portfolio/final.html"> Ashley Quicho</a>
                 </div>
                 <div class="social-icon">
                     <div class="icon-circle"></div>
-                    <span>Twitter</span>
+                    <a href="../kristine/portfolio/final.html"> Marian Talaid</a>
+                </div>
+                <div class="social-icon">
+                    <div class="icon-circle"></div>
+                    <a href="../Stephanie/MyPortfolio.html"> Stephanie Villamor</a>
+                </div>
+                <div class="social-icon">
+                    <div class="icon-circle"></div>
+                    <a href="../kristine/portfolio/final.html"> Shadia Lagoyo</a>
                 </div>
             </div>
         </div>

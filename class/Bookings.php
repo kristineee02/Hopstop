@@ -9,18 +9,18 @@ class Booking {
 
     public function getAllBookingDetails() {
         try {
-            $query = "SELECT b.*, 
-                      p.name as passenger_name, 
-                      bs.location, bs.destination, bs.departure_time, bs.arrival_time, bs.bus_type, bs.price 
+            $query = "SELECT b.booking_id, b.passenger_id, b.bus_id, b.reserve_name, b.passenger_type, 
+                             b.seat_number, b.id_upload, b.reference, b.remarks, b.status,
+                             bs.price
                       FROM " . $this->table . " b
-                      LEFT JOIN passenger p ON b.passenger_id = p.passenger_id
-                      LEFT JOIN bus bs ON b.bus_id = bs.bus_id";
+                      LEFT JOIN bus bs ON b.bus_id = bs.bus_id
+                      WHERE b.status IN ('pending', 'confirmed')";
             $stmt = $this->conn->prepare($query);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             error_log("Database error in getAllBookingDetails: " . $e->getMessage());
-            throw new Exception("Failed to fetch bookings: " . $e->getMessage());
+            throw new Exception("Failed to fetch booking details: " . $e->getMessage());
         }
     }
 

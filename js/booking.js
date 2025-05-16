@@ -1,160 +1,126 @@
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     loadBookings();
-    document.getElementById("search-reference").addEventListener("keyup", searchBookings);
-    // Poll for new bookings every 30 seconds
-    setInterval(loadBookings, 30000);
+
+    // Add event listener for search functionality
+    const searchInput = document.getElementById("search-reference");
+    if (searchInput) {
+        searchInput.addEventListener("keyup", function () {
+            searchBookings();
+        });
+    }
 });
 
 function loadBookings() {
+    const bookingTableBody = document.getElementById("BookingTableBody");
+    if (bookingTableBody) {
+        bookingTableBody.innerHTML = `<tr><td colspan="5" style="text-align: center;">Loading...</td></tr>`;
+    }
+
     fetch("../api/booking_api.php")
         .then(response => {
-            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            console.log("API Response Status:", response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
             return response.json();
         })
         .then(data => {
-            const BookingTableBody = document.getElementById("BookingTableBody");
-            BookingTableBody.innerHTML = "";
-            if (data.status === "success" && data.bookings) {
+            console.log("API Response Data:", data); 
+            if (!bookingTableBody) {
+                console.error("Booking table body not found!");
+                return;
+            }
+
+            bookingTableBody.innerHTML = "";
+
+            if (data.status === "success" && data.bookings && data.bookings.length > 0) {
                 data.bookings.forEach(booking => {
-                    const price = booking.passenger_type === 'Regular' ? 
-                        parseFloat(booking.price).toFixed(2) : 
-                        (parseFloat(booking.price) * 0.8).toFixed(2);
-                    const statusClass = booking.status === 'confirmed' ? 'status-confirmed' : 
-                                       booking.status === 'cancelled' ? 'status-cancelled' : 'status-pending';
+                    const statusClass = booking.status === 'confirmed' ? 'status-confirmed' : 'status-pending';
+                    const price = booking.price ? parseFloat(booking.price).toFixed(2) : '0.00';
+
                     const row = document.createElement('tr');
+                    row.className = 'clickable-row';
                     row.innerHTML = `
-                        <td>${booking.booking_id || ''}</td>
-                        <td>${booking.reference || ''}</td>
-                        <td>${booking.passenger_name || ''}</td>
-                        <td>${booking.reserve_name || ''}</td>
-                        <td>${booking.passenger_type || ''}</td>
-                        <td>${booking.bus_id || ''}</td>
-                        <td>${booking.seat_number || ''}</td>
-                        <td>${booking.location || ''}</td>
-                        <td>${booking.destination || ''}</td>
-                        <td>${formatTime(booking.departure_time) || ''}</td>
-                        <td>${formatTime(booking.arrival_time) || ''}</td>
-                        <td>₱${price || '0'}</td>
-                        <td>${booking.remarks || ''}</td>
-                        <td>${booking.id_upload_path ? `<a href="${booking.id_upload_path}" target="_blank">View</a>` : ''}</td>
+                        <td>${booking.reference || 'N/A'}</td>
+                        <td>${booking.passenger_type || 'N/A'}</td>
+                        <td>${booking.seat_number || 'N/A'}</td>
+                        <td>₱${price}</td>
                         <td>
                             <button class="status-btn ${statusClass}" 
-                                    onclick="updateStatus('${booking.reference}', '${getNextStatus(booking.status)}')">
-                                ${booking.status.charAt(0).toUpperCase() + booking.status.slice(1) || 'Pending'}
+                                    onclick="updateStatus('${booking.reference}', '${booking.status === 'confirmed' ? 'pending' : 'confirmed'}')">
+                                ${booking.status || 'pending'}
                             </button>
                         </td>
                     `;
-                    row.classList.add("clickable-row");
-                    row.addEventListener("click", function(e) {
-                        if (!e.target.classList.contains('status-btn') && e.target.tagName !== 'A') {
-                            openEditModal(booking);
+                    row.addEventListener("click", function (event) {
+                        if (event.target.tagName !== 'BUTTON') {
+                            displayBookingDetails(booking);
                         }
                     });
-                    BookingTableBody.appendChild(row);
+                    bookingTableBody.appendChild(row);
                 });
             } else {
-                console.error("Error loading bookings:", data.message || "Unknown error");
-                BookingTableBody.innerHTML = '<tr><td colspan="15">No bookings found</td></tr>';
+                console.warn("No bookings found or API error:", data.message || "Empty response");
+                bookingTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center;">No bookings found.</td>
+                    </tr>
+                `;
             }
         })
         .catch(error => {
-            console.error("Error fetching data:", error);
-            document.getElementById("BookingTableBody").innerHTML = '<tr><td colspan="15">Error loading bookings</td></tr>';
-        });
-}
-
-function formatTime(timeString) {
-    if (!timeString) return '';
-    try {
-        const date = new Date(`2000-01-01T${timeString}`);
-        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    } catch (e) {
-        return timeString;
-    }
-}
-
-function getNextStatus(currentStatus) {
-    if (currentStatus === 'confirmed') return 'pending';
-    if (currentStatus === 'cancelled') return 'pending';
-    return 'confirmed';
-}
-
-function openEditModal(booking) {
-    document.getElementById("editBookingId").value = booking.booking_id || '';
-    document.getElementById("editReference").value = booking.reference || '';
-    document.getElementById("editPassengerName").value = booking.passenger_name || '';
-    document.getElementById("editReserveName").value = booking.reserve_name || '';
-    document.getElementById("editPassengerType").value = booking.passenger_type || '';
-    document.getElementById("editBusId").value = booking.bus_id || '';
-    document.getElementById("editSeatNumber").value = booking.seat_number || '';
-    document.getElementById("editPrice").value = booking.passenger_type === 'Regular' ? 
-        parseFloat(booking.price).toFixed(2) : (parseFloat(booking.price) * 0.8).toFixed(2);
-    document.getElementById("editStatus").value = booking.status || 'pending';
-    document.getElementById("editRemarks").value = booking.remarks || '';
-    document.getElementById("editIdUpload").value = booking.id_upload_path || '';
-    document.getElementById("editLocation").value = booking.location || '';
-    document.getElementById("editDestination").value = booking.destination || '';
-    document.getElementById("editDeparture").value = formatTime(booking.departure_time) || '';
-    document.getElementById("editArrival").value = formatTime(booking.arrival_time) || '';
-    document.getElementById("editBookingModal").style.display = "block";
-}
-
-function closeEditModal() {
-    document.getElementById("editBookingModal").style.display = "none";
-}
-
-function updateBooking() {
-    const formData = {
-        reference: document.getElementById("editReference").value,
-        reserve_name: document.getElementById("editReserveName").value,
-        passenger_type: document.getElementById("editPassengerType").value,
-        bus_id: document.getElementById("editBusId").value,
-        seat_number: document.getElementById("editSeatNumber").value,
-        price: document.getElementById("editPrice").value,
-        status: document.getElementById("editStatus").value,
-        remarks: document.getElementById("editRemarks").value
-    };
-    for (const key in formData) {
-        if (!formData[key] && key !== 'remarks') {
-            alert(`${key.replace(/_/g, ' ')} is required!`);
-            return;
-        }
-    }
-    fetch("../api/booking_api.php", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
-    })
-        .then(response => {
-            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-            return response.json();
-        })
-        .then(data => {
-            alert(data.message);
-            if (data.status === "success") {
-                closeEditModal();
-                loadBookings();
+            console.error("Error fetching bookings:", error);
+            if (bookingTableBody) {
+                bookingTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center;">Error loading bookings: ${error.message}</td>
+                    </tr>
+                `;
             }
-        })
-        .catch(error => {
-            console.error("Error updating booking:", error);
-            alert("Failed to update booking: " + error.message);
         });
+}
+
+function displayBookingDetails(booking) {
+    const bookingDetailsContainer = document.getElementById("booking-details");
+    if (!bookingDetailsContainer) {
+        console.error("Booking details container not found!");
+        return;
+    }
+
+    const price = booking.price ? parseFloat(booking.price).toFixed(2) : '0.00';
+    bookingDetailsContainer.innerHTML = `
+        <h3>Booking Details</h3>
+        <p><strong>Reference:</strong> ${booking.reference || 'N/A'}</p>
+        <p><strong>Passenger Type:</strong> ${booking.passenger_type || 'N/A'}</p>
+        <p><strong>Seat Number:</strong> ${booking.seat_number || 'N/A'}</p>
+        <p><strong>Price:</strong> ₱${price}</p>
+        <p><strong>Status:</strong> ${booking.status || 'pending'}</p>
+    `;
 }
 
 function updateStatus(reference, newStatus) {
     event.stopPropagation();
+
+    const formData = {
+        reference: reference,
+        status: newStatus
+    };
+
     fetch("../api/booking_api.php", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ reference, status: newStatus })
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(formData)
     })
         .then(response => {
-            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            console.log("Update Status Response Status:", response.status); // Debug
             return response.json();
         })
         .then(data => {
+            console.log("Update Status Response Data:", data); // Debug
             if (data.status === "success") {
+                alert(`Booking status updated to ${newStatus}`);
                 loadBookings();
             } else {
                 alert("Failed to update status: " + data.message);
@@ -162,74 +128,87 @@ function updateStatus(reference, newStatus) {
         })
         .catch(error => {
             console.error("Error updating status:", error);
-            alert("Failed to update status: " + error.message);
+            alert("An error occurred while updating the status.");
         });
 }
 
 function filterPassengerType() {
     const filterValue = document.getElementById("filterPassType").value;
-    const url = filterValue ? `../api/booking_api.php?passenger_type=${encodeURIComponent(filterValue)}` : "../api/booking_api.php";
-    fetch(url)
-        .then(response => {
-            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-            return response.json();
-        })
-        .then(data => {
-            const BookingTableBody = document.getElementById("BookingTableBody");
-            BookingTableBody.innerHTML = "";
-            if (data.status === "success" && data.bookings) {
-                data.bookings.forEach(booking => {
-                    const price = booking.passenger_type === 'Regular' ? 
-                        parseFloat(booking.price).toFixed(2) : 
-                        (parseFloat(booking.price) * 0.8).toFixed(2);
-                    const statusClass = booking.status === 'confirmed' ? 'status-confirmed' : 
-                                       booking.status === 'cancelled' ? 'status-cancelled' : 'status-pending';
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${booking.booking_id || ''}</td>
-                        <td>${booking.reference || ''}</td>
-                        <td>${booking.passenger_name || ''}</td>
-                        <td>${booking.reserve_name || ''}</td>
-                        <td>${booking.passenger_type || ''}</td>
-                        <td>${booking.bus_id || ''}</td>
-                        <td>${booking.seat_number || ''}</td>
-                        <td>${booking.location || ''}</td>
-                        <td>${booking.destination || ''}</td>
-                        <td>${formatTime(booking.departure_time) || ''}</td>
-                        <td>${formatTime(booking.arrival_time) || ''}</td>
-                        <td>₱${price || '0'}</td>
-                        <td>${booking.remarks || ''}</td>
-                        <td>${booking.id_upload_path ? `<a href="${booking.id_upload_path}" target="_blank">View</a>` : ''}</td>
-                        <td>
-                            <button class="status-btn ${statusClass}" 
-                                    onclick="updateStatus('${booking.reference}', '${getNextStatus(booking.status)}')">
-                                ${booking.status.charAt(0).toUpperCase() + booking.status.slice(1) || 'Pending'}
-                            </button>
-                        </td>
-                    `;
-                    row.classList.add("clickable-row");
-                    row.addEventListener("click", function(e) {
-                        if (!e.target.classList.contains('status-btn') && e.target.tagName !== 'A') {
-                            openEditModal(booking);
-                        }
+
+    if (filterValue === "") {
+        loadBookings();
+    } else {
+        fetch(`../api/booking_api.php?passenger_type=${encodeURIComponent(filterValue)}`)
+            .then(response => {
+                console.log("Filter API Response Status:", response.status); // Debug
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Filter API Response Data:", data); // Debug
+                const bookingTableBody = document.getElementById("BookingTableBody");
+                if (!bookingTableBody) {
+                    console.error("Booking table body not found!");
+                    return;
+                }
+
+                bookingTableBody.innerHTML = "";
+
+                if (data.status === "success" && data.bookings && data.bookings.length > 0) {
+                    data.bookings.forEach(booking => {
+                        const statusClass = booking.status === 'confirmed' ? 'status-confirmed' : 'status-pending';
+                        const price = booking.price ? parseFloat(booking.price).toFixed(2) : '0.00';
+
+                        const row = document.createElement('tr');
+                        row.className = 'clickable-row';
+                        row.innerHTML = `
+                            <td>${booking.reference || 'N/A'}</td>
+                            <td>${booking.passenger_type || 'N/A'}</td>
+                            <td>${booking.seat_number || 'N/A'}</td>
+                            <td>₱${price}</td>
+                            <td>
+                                <button class="status-btn ${statusClass}" 
+                                        onclick="updateStatus('${booking.reference}', '${booking.status === 'confirmed' ? 'pending' : 'confirmed'}')">
+                                    ${booking.status || 'pending'}
+                                </button>
+                            </td>
+                        `;
+                        row.addEventListener("click", function (event) {
+                            if (event.target.tagName !== 'BUTTON') {
+                                displayBookingDetails(booking);
+                            }
+                        });
+                        bookingTableBody.appendChild(row);
                     });
-                    BookingTableBody.appendChild(row);
-                });
-            } else {
-                BookingTableBody.innerHTML = '<tr><td colspan="15">No bookings found</td></tr>';
-            }
-        })
-        .catch(error => {
-            console.error("Error filtering bookings:", error);
-            document.getElementById("BookingTableBody").innerHTML = '<tr><td colspan="15">Error loading bookings</td></tr>';
-        });
+                } else {
+                    bookingTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="5" style="text-align: center;">No bookings found for ${filterValue}.</td>
+                        </tr>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error("Error filtering bookings:", error);
+                if (bookingTableBody) {
+                    bookingTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="5" style="text-align: center;">Error loading bookings: ${error.message}</td>
+                        </tr>
+                    `;
+                }
+            });
+    }
 }
 
 function searchBookings() {
     const searchValue = document.getElementById("search-reference").value.toLowerCase();
     const rows = document.getElementById("BookingTableBody").getElementsByTagName("tr");
+
     for (let i = 0; i < rows.length; i++) {
-        const referenceCell = rows[i].getElementsByTagName("td")[1]; // Reference is second column
+        const referenceCell = rows[i].getElementsByTagName("td")[0];
         if (referenceCell) {
             const reference = referenceCell.textContent || referenceCell.innerText;
             rows[i].style.display = reference.toLowerCase().includes(searchValue) ? "" : "none";
